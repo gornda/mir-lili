@@ -147,6 +147,11 @@ body{
 @keyframes walkbob{0%,100%{transform:translateY(0) scaleX(var(--fx,1)) rotate(0)}50%{transform:translateY(-7px) scaleX(var(--fx,1)) rotate(2deg)}}
 #sprite.jump .flip{animation:jump .55s ease}
 @keyframes jump{0%,100%{transform:translateY(0)}45%{transform:translateY(-34px)}}
+#sprite.sleeping{z-index:9}
+#sprite.sleeping .flip{transform:rotate(-90deg);animation:none;transition:transform .5s}
+#blanket{position:absolute;display:none;z-index:11;border-radius:16px;pointer-events:none;
+  background:linear-gradient(180deg,#b48ae0,#9f74cf);border:3px solid #9a6cc9;box-shadow:0 4px 0 #8a5cb9}
+#blanket::after{content:"♥";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#ffd2e8;font-size:20px}
 /* speech bubble */
 #bubble{
   position:absolute;bottom:103%;left:50%;transform:translateX(-50%) scale(0);transform-origin:bottom center;
@@ -321,6 +326,7 @@ body{
     <button class="obj" data-id="h-cat" style="left:65%;bottom:8%;font-size:52px">🐱</button>
     <button class="obj" data-id="h-bear" style="right:19%;bottom:39%;font-size:42px">🧸</button>
     <div id="lampglow" style="right:-52px;bottom:16%"></div>
+    <div id="blanket"></div>
     <div id="night"></div>
   </div>
 
@@ -581,6 +587,10 @@ function charSVG(uid){
     <path d="M130,158 Q156,172 163,198" stroke="${sk}" stroke-width="13" fill="none" stroke-linecap="round"/>`;
   const eye=(cx,dir)=>{
     const ox=cx+11*dir;
+    if(st.sleep){ /* закрытые глазки */
+      return `<path d="M${cx-10},100 Q${cx},109 ${cx+10},100" stroke="#3a2a1e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+      <path d="M${ox-2*dir},103 Q${ox+2*dir},107 ${ox+6*dir},107" stroke="#3a2a1e" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+    }
     return `<ellipse cx="${cx}" cy="99" rx="12" ry="14" fill="#fff"/>
     <ellipse cx="${cx}" cy="100" rx="9.5" ry="12" fill="url(#iris-${uid})"/>
     <ellipse cx="${cx}" cy="101.5" rx="5.5" ry="7.5" fill="#2a1a0e"/>
@@ -634,6 +644,7 @@ const S={
   whee(){tone(400,.5,{f2:900,type:"triangle",vol:.1});},
   night(){tone(500,.3,{f2:250,type:"sine",vol:.1});},
   melody(){[523,587,659,784,659,880,784].forEach((n,i)=>tone(n,.16,{delay:i*.17,type:"triangle",vol:.11}));},
+  lullaby(){[659,587,523].forEach((n,i)=>tone(n,.5,{delay:i*.55,type:"triangle",vol:.09}));},
   fanfare(){[523,659,784,1047].forEach((n,i)=>tone(n,.25,{delay:i*.13,type:"triangle",vol:.14}));}
 };
 document.getElementById("sndbtn").addEventListener("click",e=>{
@@ -720,6 +731,7 @@ document.getElementById("popok").addEventListener("click",()=>{
 /* ============ SCENES & NAV ============ */
 let curScene=document.getElementById("sc-home");
 function showScene(id){
+  if(typeof wake==="function")wake(false);
   document.querySelectorAll(".scene").forEach(s=>s.classList.remove("active"));
   curScene=document.getElementById(id);
   curScene.classList.add("active");
@@ -748,6 +760,7 @@ document.querySelectorAll(".scene").forEach(sc=>{
   if(sc.id==="sc-fit")return;
   sc.addEventListener("click",e=>{
     if(e.target.closest(".obj")||e.target.closest("#butterfly"))return;
+    if(st.sleep){wake(true);return;}
     const rect=sc.getBoundingClientRect();
     let x=e.clientX-rect.left-sprite.offsetWidth/2;
     x=Math.max(4,Math.min(rect.width-sprite.offsetWidth-4,x));
@@ -763,11 +776,68 @@ document.querySelectorAll(".scene").forEach(sc=>{
   });
 });
 
+/* ============ SLEEP ============ */
+let zzT=null;
+function bedInfo(){
+  const bed=document.querySelector('#sc-home [data-id="h-bed"]');
+  const b=bed.getBoundingClientRect(), s=document.getElementById("sc-home").getBoundingClientRect();
+  return {left:b.left-s.left, width:b.width, height:b.height, bottomOff:s.bottom-b.bottom};
+}
+function doSleep(){
+  const bi=bedInfo();
+  st.sleep=true; renderChar();
+  sprite.classList.remove("walking","left");
+  sprite.classList.add("sleeping");
+  sprite.style.transition="none";
+  sprite.style.left=(bi.left+bi.width*0.42-sprite.offsetWidth/2)+"px";
+  sprite.style.bottom=(bi.bottomOff+bi.height*0.30)+"px";
+  const bl=document.getElementById("blanket");
+  bl.style.display="block";
+  bl.style.left=(bi.left+bi.width*0.42)+"px";
+  bl.style.width=(bi.width*0.52)+"px";
+  bl.style.height=(bi.height*0.52)+"px";
+  bl.style.bottom=(bi.bottomOff+bi.height*0.30)+"px";
+  document.getElementById("sc-home").classList.add("night");
+  say("Спокойной ночи... 💤",2200);
+  S.lullaby();
+  zzT=setInterval(()=>{
+    if(!st.sleep)return;
+    const r=sprite.getBoundingClientRect(), s=stage.getBoundingClientRect();
+    burst(r.left-s.left+r.width*0.3, r.top-s.top+4, ["💤"],1);
+  },1600);
+}
+function wake(morning){
+  if(!st.sleep)return;
+  st.sleep=false; renderChar();
+  sprite.classList.remove("sleeping");
+  sprite.style.bottom="";
+  document.getElementById("blanket").style.display="none";
+  document.getElementById("sc-home").classList.remove("night");
+  if(zzT){clearInterval(zzT);zzT=null;}
+  if(morning){say("Доброе утро! ☀️");S.chirp();}
+}
+
 /* ============ OBJECT ACTIONS ============ */
 const ACTIONS={
   "h-cat":(el)=>{S.meow();miniSay(el,"Мяу! 🐾");burstAt(el,["❤️","💗"],6);},
   "h-bear":(el)=>{S.pop();miniSay(el,"Обнимашки!");burstAt(el,["❤️","🧡"],6);},
-  "h-bed":(el)=>{S.night();miniSay(el,"Тс-с-с...");burstAt(el,["💤","🌙"],5);},
+  "h-bed":(el)=>{
+    if(st.sleep){wake(true);return;}
+    S.night();
+    const bi=bedInfo();
+    const target=bi.left+bi.width*0.42-sprite.offsetWidth/2;
+    const cur=parseFloat(sprite.style.left)||0;
+    const dist=Math.abs(target-cur);
+    if(dist>10){
+      sprite.classList.toggle("left",target<cur);
+      sprite.style.setProperty("--fx",target<cur?-1:1);
+      sprite.style.transition=`left ${Math.max(.35,dist/240)}s linear`;
+      sprite.classList.add("walking");
+      requestAnimationFrame(()=>{sprite.style.left=target+"px";});
+      clearTimeout(sprite._wt);
+      setTimeout(doSleep,Math.max(350,dist/240*1000)+80);
+    }else doSleep();
+  },
   "h-window":(el)=>{S.chirp();burstAt(el,["🐦","☀️","✨"],5);},
   "h-pic":(el)=>{S.pop();burstAt(el,["💘","💗","💖"],6);},
   "h-lamp":(el)=>{
