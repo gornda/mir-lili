@@ -943,7 +943,7 @@ function buildFitBody(){
 
 /* ============ INIT ============ */
 /* офлайн-режим (PWA): работает только по https, локально просто пропускается */
-if("serviceWorker" in navigator && location.protocol === "https:"){
+if("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")){
   navigator.serviceWorker.register("./sw.js").catch(()=>{});
 }
 /* Надёжная высота для встроенных браузеров (Telegram, VK и т.п.):

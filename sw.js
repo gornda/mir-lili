@@ -1,4 +1,4 @@
-const CACHE = "mir-lili-v4";
+const CACHE = "mir-lili-v5";
 const FILES = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 
 self.addEventListener("install", e => {
@@ -11,8 +11,25 @@ self.addEventListener("activate", e => {
       .then(() => self.clients.claim())
   );
 });
+/* Игра (index): сначала сеть — свежая версия с первого же обновления страницы,
+   при отсутствии интернета — из кеша. Остальное (иконки): сначала кеш. */
 self.addEventListener("fetch", e => {
-  e.respondWith(
-    caches.match(e.request, { ignoreSearch: true }).then(r => r || fetch(e.request))
-  );
+  const req = e.request;
+  const isPage = req.mode === "navigate" || req.url.includes("index.html");
+  if (isPage) {
+    e.respondWith(
+      fetch(req).then(r => {
+        const copy = r.clone();
+        caches.open(CACHE).then(c => { c.put("./index.html", copy.clone()); c.put("./", copy); }).catch(() => {});
+        return r;
+      }).catch(() =>
+        caches.match(req, { ignoreSearch: true })
+          .then(r => r || caches.match("./index.html"))
+      )
+    );
+  } else {
+    e.respondWith(
+      caches.match(req, { ignoreSearch: true }).then(r => r || fetch(req))
+    );
+  }
 });
