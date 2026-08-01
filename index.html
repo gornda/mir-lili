@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Мир Лили 🌸</title>
+<meta name="theme-color" content="#ff8ab7">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Мир Лили">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+body{
+  font-family:"Nunito","Segoe UI",-apple-system,BlinkMacSystemFont,"Arial Rounded MT Bold",sans-serif;
+  background:#ffeaf3;display:flex;flex-direction:column;touch-action:manipulation;
+  user-select:none;-webkit-user-select:none;
+  position:fixed;top:0;left:0;right:0;width:100%;
+}
+/* ---------- TOP BAR ---------- */
+#topbar{
+  flex:0 0 auto;min-height:52px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 12px;
+  padding:env(safe-area-inset-top,0px) 12px 0;background:linear-gradient(180deg,#ff9ec4,#ff8ab7);
+  box-shadow:0 3px 0 #e5749b;z-index:50;position:relative;
+}
+#topbar .title{font-weight:800;font-size:19px;color:#fff;text-shadow:0 2px 0 #e0669c;letter-spacing:.5px}
+#topbar .right{display:flex;align-items:center;gap:8px}
+#starbox{
+  background:#fff;border-radius:20px;padding:4px 12px;font-weight:800;color:#e8862c;
+  font-size:16px;box-shadow:0 2px 0 #e5749b;transition:transform .2s;
+}
+#starbox.bump{transform:scale(1.25)}
+#sndbtn{
+  width:38px;height:38px;border:none;border-radius:50%;background:#fff;font-size:18px;
+  box-shadow:0 2px 0 #e5749b;cursor:pointer;
+}
+/* ---------- STAGE ---------- */
+#stage{flex:1 1 auto;position:relative;overflow:hidden;background:#fff5fa}
+.scene{position:absolute;inset:0;display:none;overflow:hidden}
+.scene.active{display:block}
+.wall{position:absolute;left:0;right:0;top:0;bottom:26%}
+.floor{position:absolute;left:0;right:0;bottom:0;height:26%}
+/* home */
+#sc-home .wall{
+  background:#ffeaf3;
+  background-image:radial-gradient(circle at 12px 12px,#ffd2e6 7px,transparent 8px);
+  background-size:64px 64px;
+}
+#sc-home .floor{
+  background:repeating-linear-gradient(90deg,#f0cda2 0 68px,#e6bf91 68px 72px);
+  box-shadow:inset 0 6px 0 rgba(214,166,110,.55);
+}
+/* cafe */
+#sc-cafe .wall{background:#fff6e8;background-image:radial-gradient(circle at 14px 14px,#ffe6c4 6px,transparent 7px);background-size:70px 70px}
+#sc-cafe .floor{
+  height:22%;
+  background-color:#fff3e2;
+  background-image:
+    linear-gradient(45deg,#ffd9b8 25%,transparent 25%,transparent 75%,#ffd9b8 75%),
+    linear-gradient(45deg,#ffd9b8 25%,transparent 25%,transparent 75%,#ffd9b8 75%);
+  background-size:52px 52px;background-position:0 0,26px 26px;
+}
+/* park */
+#sc-park .wall{bottom:30%;background:linear-gradient(180deg,#a5dcff 0%,#d8f2ff 80%,#e9f9ef 100%)}
+#sc-park .floor{height:30%;background:linear-gradient(180deg,#93d873 0%,#7cc95e 60%,#6bbc50 100%);box-shadow:inset 0 6px 0 rgba(120,190,90,.6)}
+/* wardrobe */
+#sc-fit{background:linear-gradient(180deg,#ffe4f0 0%,#f6e6ff 100%);display:none;flex-direction:column}
+#sc-fit.active{display:flex}
+
+.deco{position:absolute;pointer-events:none}
+.deco.tappable{pointer-events:auto;cursor:pointer;border:none;background:none}
+
+/* generic emoji object buttons */
+.obj{
+  position:absolute;border:none;background:none;cursor:pointer;line-height:1;
+  filter:drop-shadow(0 4px 3px rgba(150,90,120,.25));z-index:6;padding:4px;
+}
+.obj:active{transform:scale(.9)}
+.obj.boing{animation:boing .5s}
+@keyframes boing{
+  0%{transform:scale(1)}30%{transform:scale(1.3) rotate(-6deg)}
+  60%{transform:scale(.92) rotate(5deg)}100%{transform:scale(1)}
+}
+/* sun & clouds */
+#sun{position:absolute;top:5%;left:6%;width:74px;height:74px;border-radius:50%;
+  background:radial-gradient(circle,#ffe990 55%,#ffd44d 100%);
+  box-shadow:0 0 46px 18px rgba(255,224,120,.75);animation:sunpulse 4s ease-in-out infinite}
+@keyframes sunpulse{50%{box-shadow:0 0 60px 26px rgba(255,224,120,.9)}}
+.cloud{position:absolute;background:#fff;border-radius:40px;opacity:.95}
+.cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+.cloud.c1{width:96px;height:30px;top:9%;left:110%;animation:drift 42s linear infinite}
+.cloud.c1::before{width:42px;height:42px;top:-20px;left:14px}
+.cloud.c1::after{width:30px;height:30px;top:-14px;left:52px}
+.cloud.c2{width:70px;height:24px;top:20%;left:110%;animation:drift 58s linear infinite -20s}
+.cloud.c2::before{width:32px;height:32px;top:-16px;left:10px}
+.cloud.c2::after{width:24px;height:24px;top:-10px;left:38px}
+.cloud.c3{width:110px;height:32px;top:36%;left:110%;animation:drift 72s linear infinite -40s}
+.cloud.c3::before{width:46px;height:46px;top:-22px;left:16px}
+.cloud.c3::after{width:34px;height:34px;top:-16px;left:58px}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-160vw)}}
+/* butterfly */
+#butterfly{position:absolute;font-size:30px;z-index:7;animation:flutter 14s ease-in-out infinite;border:none;background:none;cursor:pointer}
+@keyframes flutter{
+  0%{left:8%;top:30%}20%{left:35%;top:16%}40%{left:60%;top:34%}
+  60%{left:42%;top:48%}80%{left:16%;top:40%}100%{left:8%;top:30%}
+}
+/* pond */
+#pond{position:absolute;right:6%;bottom:4%;width:34%;height:14%;border-radius:50%;
+  background:radial-gradient(ellipse,#9fd9f7 60%,#7bc3ec 100%);box-shadow:inset 0 4px 8px rgba(80,140,190,.4)}
+/* swing animation */
+.swingG{transform-box:view-box;transform-origin:244px 118px}
+.swingG.go{animation:swinging 1.1s ease-in-out 3}
+@keyframes swinging{0%,100%{transform:rotate(0)}25%{transform:rotate(13deg)}75%{transform:rotate(-13deg)}}
+/* night overlay */
+#night{position:absolute;inset:0;background:#25317c;opacity:0;pointer-events:none;transition:opacity .7s;z-index:8;mix-blend-mode:multiply}
+#sc-home.night #night{opacity:.62}
+#lampglow{position:absolute;width:220px;height:220px;border-radius:50%;z-index:9;pointer-events:none;
+  background:radial-gradient(circle,rgba(255,236,150,.55) 0%,rgba(255,236,150,0) 70%);opacity:0;transition:opacity .7s}
+#sc-home.night #lampglow{opacity:1}
+/* counter (cafe) */
+#counter{position:absolute;left:3%;right:30%;bottom:13%;height:26%;z-index:5}
+#counter .front{position:absolute;inset:0;border-radius:0 0 20px 20px;z-index:2;
+  background:linear-gradient(180deg,#ff9ec4,#f386b1);box-shadow:0 5px 0 #d96f9c, inset 0 -10px 0 rgba(0,0,0,.05)}
+#counter .ctop{position:absolute;left:-3%;right:-3%;top:-12px;height:22px;background:#fff;border-radius:12px;box-shadow:0 4px 0 #edc7db;z-index:2}
+#counter .case{position:absolute;left:5%;right:5%;top:10%;bottom:18%;background:#fff8fb;border-radius:14px;
+  box-shadow:inset 0 3px 8px rgba(190,120,150,.28);display:flex;flex-wrap:wrap;align-items:center;justify-content:space-evenly;padding:4px}
+#counter .case .obj{position:relative}
+#counter .heartrow{position:absolute;left:0;right:0;bottom:2%;text-align:center;font-size:14px;color:#fff;opacity:.9;letter-spacing:10px}
+#menuboard{position:absolute;right:4%;top:9%;width:26%;min-width:120px;background:#7c5b45;border-radius:14px;padding:10px 6px;
+  text-align:center;color:#fff8ea;box-shadow:0 4px 0 #644836;z-index:4}
+#menuboard .mtitle{font-weight:800;font-size:15px;letter-spacing:2px}
+#menuboard .mrow{font-size:19px;margin-top:5px}
+/* rug */
+#rug{position:absolute;left:52%;bottom:5%;width:40%;height:11%;border-radius:50%;z-index:2;
+  background:radial-gradient(ellipse,#ffd2e6 0 38%,#ffb7d5 39% 68%,#ff9ec4 69% 100%)}
+/* sprite */
+#sprite{position:absolute;width:96px;z-index:10;bottom:var(--sb,7%);will-change:left}
+#sprite .flip{transition:transform .15s}
+#sprite.left .flip{transform:scaleX(-1)}
+#sprite svg{width:100%;display:block}
+#sprite.walking .flip{animation:walkbob .32s ease-in-out infinite}
+@keyframes walkbob{0%,100%{transform:translateY(0) scaleX(var(--fx,1)) rotate(0)}50%{transform:translateY(-7px) scaleX(var(--fx,1)) rotate(2deg)}}
+#sprite.jump .flip{animation:jump .55s ease}
+@keyframes jump{0%,100%{transform:translateY(0)}45%{transform:translateY(-34px)}}
+/* speech bubble */
+#bubble{
+  position:absolute;bottom:103%;left:50%;transform:translateX(-50%) scale(0);transform-origin:bottom center;
+  background:#fff;border-radius:14px;padding:7px 12px;font-weight:800;font-size:15px;color:#b0498a;
+  white-space:nowrap;box-shadow:0 3px 0 rgba(210,140,175,.5);transition:transform .22s;z-index:20;
+}
+#bubble::after{content:"";position:absolute;top:100%;left:50%;margin-left:-7px;border:7px solid transparent;border-top-color:#fff}
+#bubble.show{transform:translateX(-50%) scale(1)}
+/* floating mini-bubble at objects */
+.minisay{position:absolute;background:#fff;border-radius:12px;padding:5px 10px;font-weight:800;font-size:14px;color:#8a55b0;
+  box-shadow:0 3px 0 rgba(190,150,210,.4);z-index:30;animation:minisay 1.4s ease forwards;pointer-events:none;white-space:nowrap}
+@keyframes minisay{0%{transform:scale(0)}18%{transform:scale(1.1)}28%{transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:translateY(-16px)}}
+/* particles */
+.pt{position:absolute;z-index:40;pointer-events:none;animation:fly .9s ease-out forwards;font-size:20px}
+@keyframes fly{
+  0%{transform:translate(0,0) scale(.6);opacity:1}
+  100%{transform:translate(var(--dx),var(--dy)) scale(1.25);opacity:0}
+}
+.starfly{position:fixed;z-index:100;font-size:26px;pointer-events:none;transition:all .8s cubic-bezier(.5,-0.3,.6,1)}
+/* hint */
+.hint{position:absolute;top:10px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.92);color:#c05a92;
+  font-weight:800;font-size:14px;padding:7px 14px;border-radius:20px;z-index:45;box-shadow:0 3px 0 rgba(220,150,185,.4);
+  animation:hintfade 4s ease forwards;pointer-events:none;max-width:92%;text-align:center}
+@keyframes hintfade{0%{opacity:0;transform:translate(-50%,-10px)}10%,75%{opacity:1;transform:translate(-50%,0)}100%{opacity:0}}
+/* ---------- WARDROBE ---------- */
+#fitTop{flex:0 0 46%;display:flex;align-items:center;justify-content:center;position:relative}
+#fitChar{height:92%;filter:drop-shadow(0 8px 6px rgba(190,120,160,.3))}
+#fitChar svg{height:100%;display:block}
+#fitName{position:absolute;top:8px;left:50%;transform:translateX(-50%);font-weight:800;color:#d867a3;font-size:18px;
+  background:#fff;padding:4px 16px;border-radius:20px;box-shadow:0 3px 0 rgba(220,150,185,.4)}
+#podium{position:absolute;bottom:2%;left:50%;transform:translateX(-50%);width:190px;height:26px;border-radius:50%;
+  background:radial-gradient(ellipse,#f3c7e2 0%,#eab3d6 100%)}
+#fitPanel{flex:1 1 auto;background:#fff;border-radius:22px 22px 0 0;box-shadow:0 -4px 0 #f0c6de;
+  display:flex;flex-direction:column;overflow:hidden}
+#fitTabs{display:flex;gap:6px;padding:10px 10px 4px}
+.tab{flex:1;border:none;border-radius:14px;padding:8px 2px;font-size:13px;font-weight:800;color:#b784a8;
+  background:#f9edf5;cursor:pointer;font-family:inherit}
+.tab .ticon{display:block;font-size:20px;margin-bottom:2px}
+.tab.sel{background:linear-gradient(180deg,#ff9ec4,#ff86b5);color:#fff;box-shadow:0 3px 0 #e5749b}
+#fitBody{flex:1;overflow-y:auto;padding:8px 12px 16px}
+.rowlabel{font-size:12px;font-weight:800;color:#c99cb8;margin:8px 0 5px;letter-spacing:1px}
+.optrow{display:flex;flex-wrap:wrap;gap:8px}
+.opt{border:3px solid #f3dcea;border-radius:14px;background:#fff;padding:8px 12px;font-weight:800;font-size:14px;
+  color:#a6699a;cursor:pointer;font-family:inherit}
+.opt .oicon{margin-right:4px}
+.opt.sel{border-color:#ff86b5;background:#ffeef6;color:#e0568f}
+.opt.locked{opacity:.55}
+.dot{width:38px;height:38px;border-radius:50%;border:4px solid #f0e2ec;cursor:pointer}
+.dot.sel{border-color:#ff86b5;box-shadow:0 0 0 3px #ffd7e8}
+/* ---------- NAV ---------- */
+#nav{flex:0 0 68px;display:flex;background:#fff;box-shadow:0 -3px 0 #f3d7e6;z-index:50;padding:6px 8px;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px));gap:6px}
+.navb{flex:1;border:none;border-radius:16px;background:#fdf3f8;cursor:pointer;font-family:inherit;
+  font-weight:800;color:#bb87ab;font-size:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.navb .nicon{font-size:24px;line-height:1}
+.navb.sel{background:linear-gradient(180deg,#ff9ec4,#ff86b5);color:#fff;box-shadow:0 3px 0 #e5749b}
+/* ---------- RESPONSIVE ---------- */
+@media (max-width:374px){
+  #topbar .title{font-size:16px}
+  #starbox{font-size:14px;padding:3px 9px}
+  #sndbtn{width:32px;height:32px;font-size:15px}
+  #nav{flex:0 0 62px}
+  .navb{font-size:11px}
+  .navb .nicon{font-size:21px}
+  .tab{font-size:12px}
+  .opt{padding:7px 9px;font-size:13px}
+  .dot{width:34px;height:34px}
+  #sprite{width:84px}
+}
+@media (min-width:640px){
+  #sprite{width:132px}
+  #butterfly{font-size:42px}
+  #nav{flex:0 0 76px}
+  .navb{font-size:14px}
+  .navb .nicon{font-size:28px}
+  #bubble{font-size:17px}
+}
+#rotate{position:fixed;inset:0;background:linear-gradient(180deg,#ff9ec4,#c8a2e8);z-index:500;display:none;
+  align-items:center;justify-content:center;flex-direction:column;gap:14px;color:#fff;font-weight:800;
+  font-size:20px;text-align:center;padding:24px}
+#rotate .ph{font-size:64px;animation:rotph 1.8s ease-in-out infinite}
+@keyframes rotph{0%,15%{transform:rotate(-90deg)}55%,100%{transform:rotate(0)}}
+@media (orientation:landscape) and (max-height:540px){ #rotate{display:flex} }
+/* ---------- POPUP ---------- */
+#popup{position:fixed;inset:0;background:rgba(120,60,110,.45);z-index:200;display:none;align-items:center;justify-content:center}
+#popup.show{display:flex}
+#popcard{background:#fff;border-radius:26px;padding:28px 30px;text-align:center;max-width:82%;
+  box-shadow:0 8px 0 #e5a8c8;animation:popin .4s cubic-bezier(.2,1.6,.5,1)}
+@keyframes popin{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+#popcard .big{font-size:56px}
+#popcard h2{color:#d8569a;margin:8px 0 4px;font-size:21px}
+#popcard p{color:#b18aa5;font-weight:700;font-size:15px}
+#popcard button{margin-top:16px;border:none;background:linear-gradient(180deg,#ff9ec4,#ff86b5);color:#fff;
+  font-weight:800;font-size:16px;padding:11px 30px;border-radius:20px;box-shadow:0 4px 0 #e5749b;cursor:pointer;font-family:inherit}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="title">🌸 Мир Лили</div>
+  <div class="right">
+    <div id="starbox">⭐ <span id="starN">0</span>/10</div>
+    <button id="sndbtn">🔊</button>
+  </div>
+</div>
+
+<div id="stage">
+
+  <!-- ================= HOME ================= -->
+  <div class="scene active" id="sc-home" style="--sb:7%">
+    <div class="wall"></div>
+    <div class="floor"></div>
+    <svg class="deco" style="left:0;top:0;width:100%;height:48px" viewBox="0 0 600 52" preserveAspectRatio="none">
+      <path d="M0,6 Q150,30 300,12 Q450,30 600,6" stroke="#e8b6cc" stroke-width="4" fill="none"/>
+      <path d="M70,16 c-5,-8 -16,-3 -13,6 c2,6 13,11 13,11 c0,0 11,-5 13,-11 c3,-9 -8,-14 -13,-6 Z" fill="#ff9ec4"/>
+      <path d="M180,22 c-5,-8 -16,-3 -13,6 c2,6 13,11 13,11 c0,0 11,-5 13,-11 c3,-9 -8,-14 -13,-6 Z" fill="#c8a2e8"/>
+      <path d="M300,14 c-5,-8 -16,-3 -13,6 c2,6 13,11 13,11 c0,0 11,-5 13,-11 c3,-9 -8,-14 -13,-6 Z" fill="#ffd97a"/>
+      <path d="M420,22 c-5,-8 -16,-3 -13,6 c2,6 13,11 13,11 c0,0 11,-5 13,-11 c3,-9 -8,-14 -13,-6 Z" fill="#9fe0c0"/>
+      <path d="M530,14 c-5,-8 -16,-3 -13,6 c2,6 13,11 13,11 c0,0 11,-5 13,-11 c3,-9 -8,-14 -13,-6 Z" fill="#ff9ec4"/>
+    </svg>
+    <button class="deco tappable obj" data-id="h-window" style="left:4%;top:8%;width:44%;max-width:300px">
+      <svg viewBox="0 0 240 200" width="100%">
+        <rect x="6" y="6" width="228" height="188" rx="20" fill="#fff" stroke="#f3cfe4" stroke-width="7"/>
+        <rect x="22" y="22" width="196" height="156" rx="10" fill="#b9e4ff"/>
+        <circle cx="182" cy="58" r="21" fill="#ffe38a"/>
+        <ellipse cx="72" cy="72" rx="30" ry="14" fill="#fff" opacity=".95"/>
+        <ellipse cx="98" cy="84" rx="24" ry="11" fill="#fff" opacity=".85"/>
+        <line x1="120" y1="22" x2="120" y2="178" stroke="#fff" stroke-width="7"/>
+        <line x1="22" y1="100" x2="218" y2="100" stroke="#fff" stroke-width="7"/>
+        <path d="M8,8 H50 Q32,100 48,190 H8 Z" fill="#ffb7d5" stroke="#f0a2c6" stroke-width="4"/>
+        <path d="M232,8 H190 Q208,100 192,190 H232 Z" fill="#ffb7d5" stroke="#f0a2c6" stroke-width="4"/>
+        <path d="M6,8 H234 V24 Q225,40 216,24 Q207,40 198,24 Q189,40 180,24 Q171,40 162,24 Q153,40 144,24 Q135,40 126,24 Q117,40 108,24 Q99,40 90,24 Q81,40 72,24 Q63,40 54,24 Q45,40 36,24 Q27,40 18,24 Q12,34 6,24 Z" fill="#ff9ec4"/>
+      </svg>
+    </button>
+    <button class="deco tappable obj" data-id="h-pic" style="left:53%;top:11%;width:17%;max-width:120px">
+      <svg viewBox="0 0 120 130" width="100%">
+        <rect x="4" y="4" width="112" height="122" rx="14" fill="#fff" stroke="#f3cfe4" stroke-width="7"/>
+        <rect x="18" y="18" width="84" height="94" rx="8" fill="#ffeef6"/>
+        <path d="M60,52 c-10,-16 -34,-6 -27,12 c5,13 27,24 27,24 c0,0 22,-11 27,-24 c7,-18 -17,-28 -27,-12 Z" fill="#ff86b5"/>
+      </svg>
+    </button>
+    <div class="deco" style="left:74%;top:17%;width:14%;max-width:100px">
+      <svg viewBox="0 0 100 110" width="100%">
+        <rect x="4" y="4" width="92" height="102" rx="12" fill="#fff" stroke="#f3cfe4" stroke-width="6"/>
+        <rect x="15" y="15" width="70" height="80" rx="7" fill="#fff8dd"/>
+        <path d="M50,28 L57,46 L76,47 L61,59 L66,78 L50,67 L34,78 L39,59 L24,47 L43,46 Z" fill="#ffd44d"/>
+      </svg>
+    </div>
+    <svg class="deco" viewBox="0 0 200 60" style="right:12%;bottom:36%;width:26%;max-width:170px">
+      <rect x="0" y="8" width="200" height="18" rx="9" fill="#e8a8c4"/>
+      <path d="M34,26 L34,54 L62,26 Z" fill="#d894b4"/>
+      <path d="M166,26 L166,54 L138,26 Z" fill="#d894b4"/>
+    </svg>
+    <button class="deco tappable obj" data-id="h-bed" style="left:2%;bottom:16%;width:56%;max-width:400px">
+      <svg viewBox="0 0 320 210" width="100%">
+        <rect x="8" y="8" width="46" height="162" rx="15" fill="#e79fc0" stroke="#d07ba6" stroke-width="5"/>
+        <rect x="26" y="100" width="286" height="66" rx="18" fill="#fdf7ff" stroke="#e4d7f0" stroke-width="5"/>
+        <ellipse cx="74" cy="94" rx="37" ry="21" fill="#fff" stroke="#ead9f5" stroke-width="4"/>
+        <path d="M122,88 H296 Q312,88 312,106 V148 Q312,166 294,166 H122 Q136,140 122,127 Q136,114 122,88 Z" fill="#b48ae0" stroke="#9a6cc9" stroke-width="5"/>
+        <path d="M206,118 c-5,-9 -18,-4 -14,6 c3,7 14,12 14,12 c0,0 11,-5 14,-12 c4,-10 -9,-15 -14,-6 Z" fill="#ffd2e8"/>
+        <rect x="34" y="166" width="15" height="28" rx="6" fill="#caa2e2"/>
+        <rect x="292" y="166" width="15" height="28" rx="6" fill="#caa2e2"/>
+      </svg>
+    </button>
+    <button class="deco tappable obj" data-id="h-lamp" style="right:4%;bottom:24%;width:13%;max-width:92px">
+      <svg viewBox="0 0 100 220" width="100%">
+        <path d="M28,8 h44 l14,58 h-72 z" fill="#ffd0e2" stroke="#e8a8c4" stroke-width="5" stroke-linejoin="round"/>
+        <rect x="45" y="66" width="10" height="122" rx="4" fill="#c9b8dd"/>
+        <ellipse cx="50" cy="196" rx="36" ry="13" fill="#c9b8dd"/>
+      </svg>
+    </button>
+    <div id="rug"></div>
+    <button class="obj" data-id="h-cat" style="left:65%;bottom:8%;font-size:52px">🐱</button>
+    <button class="obj" data-id="h-bear" style="right:19%;bottom:39%;font-size:42px">🧸</button>
+    <div id="lampglow" style="right:-52px;bottom:16%"></div>
+    <div id="night"></div>
+  </div>
+
+  <!-- ================= CAFE ================= -->
+  <div class="scene" id="sc-cafe" style="--sb:5%">
+    <div class="wall"></div>
+    <div class="floor"></div>
+    <svg class="deco" style="left:0;top:0;width:100%;height:52px" viewBox="0 0 600 60" preserveAspectRatio="none">
+      <line x1="0" y1="8" x2="600" y2="8" stroke="#e8b6cc" stroke-width="4"/>
+      <path d="M10,8 L35,52 L60,8" fill="#ff9ec4"/><path d="M70,8 L95,52 L120,8" fill="#ffd97a"/>
+      <path d="M130,8 L155,52 L180,8" fill="#9fe0c0"/><path d="M190,8 L215,52 L240,8" fill="#c8a2e8"/>
+      <path d="M250,8 L275,52 L300,8" fill="#ff9ec4"/><path d="M310,8 L335,52 L360,8" fill="#ffd97a"/>
+      <path d="M370,8 L395,52 L420,8" fill="#9fe0c0"/><path d="M430,8 L455,52 L480,8" fill="#c8a2e8"/>
+      <path d="M490,8 L515,52 L540,8" fill="#ff9ec4"/><path d="M550,8 L575,52 L600,8" fill="#ffd97a"/>
+    </svg>
+    <div class="deco" style="left:7%;top:13%;width:17%;max-width:120px">
+      <svg viewBox="0 0 120 130" width="100%">
+        <rect x="4" y="4" width="112" height="122" rx="14" fill="#fff" stroke="#f0d9c0" stroke-width="7"/>
+        <rect x="18" y="18" width="84" height="94" rx="8" fill="#fff3e0"/>
+        <text x="60" y="82" font-size="48" text-anchor="middle">🧁</text>
+      </svg>
+    </div>
+    <div class="deco" style="left:30%;top:22%;width:14%;max-width:100px">
+      <svg viewBox="0 0 100 110" width="100%">
+        <rect x="4" y="4" width="92" height="102" rx="12" fill="#fff" stroke="#f0d9c0" stroke-width="6"/>
+        <rect x="15" y="15" width="70" height="80" rx="7" fill="#ffeef6"/>
+        <text x="50" y="72" font-size="38" text-anchor="middle">☕</text>
+      </svg>
+    </div>
+    <div id="menuboard">
+      <div class="mtitle">✿ МЕНЮ ✿</div>
+      <div class="mrow">🍰 🧁 🍩</div>
+      <div class="mrow">🍪 🧃 ♥</div>
+    </div>
+    <div id="counter">
+      <button class="obj" data-id="c-bear" style="left:12%;bottom:94%;font-size:58px;z-index:1">🐻</button>
+      <button class="obj" data-id="c-radio" style="right:3%;bottom:100%;font-size:34px;z-index:3">📻</button>
+      <div class="ctop"></div>
+      <div class="front">
+        <div class="case">
+          <button class="obj" data-id="c-cake" style="font-size:38px">🍰</button>
+          <button class="obj" data-id="c-cup" style="font-size:36px">🧁</button>
+          <button class="obj" data-id="c-donut" style="font-size:36px">🍩</button>
+          <button class="obj" data-id="c-cookie" style="font-size:34px">🍪</button>
+        </div>
+        <div class="heartrow">♥ ♥ ♥</div>
+      </div>
+    </div>
+    <svg class="deco" viewBox="0 0 160 150" style="right:3%;bottom:13%;width:24%;max-width:150px">
+      <ellipse cx="80" cy="26" rx="72" ry="20" fill="#fff" stroke="#eec4da" stroke-width="5"/>
+      <rect x="74" y="40" width="12" height="84" fill="#e8a8c4"/>
+      <ellipse cx="80" cy="128" rx="34" ry="10" fill="#e8a8c4"/>
+    </svg>
+    <button class="obj" data-id="c-juice" style="right:9%;bottom:25%;font-size:38px">🧃</button>
+  </div>
+
+  <!-- ================= PARK ================= -->
+  <div class="scene" id="sc-park" style="--sb:9%">
+    <div class="wall"></div>
+    <div class="floor"></div>
+    <div id="sun"></div>
+    <div class="cloud c1"></div>
+    <div class="cloud c2"></div>
+    <div class="cloud c3"></div>
+    <svg class="deco" viewBox="0 0 300 170" style="right:-6%;top:10%;width:64%;max-width:440px;opacity:.9">
+      <path d="M10,168 A140,140 0 0 1 290,168" stroke="#ff9ec4" stroke-width="15" fill="none"/>
+      <path d="M26,168 A124,124 0 0 1 274,168" stroke="#ffd97a" stroke-width="15" fill="none"/>
+      <path d="M42,168 A108,108 0 0 1 258,168" stroke="#9fe0c0" stroke-width="15" fill="none"/>
+      <path d="M58,168 A92,92 0 0 1 242,168" stroke="#9fc9f5" stroke-width="15" fill="none"/>
+      <ellipse cx="16" cy="160" rx="32" ry="17" fill="#fff"/>
+      <ellipse cx="284" cy="160" rx="32" ry="17" fill="#fff"/>
+    </svg>
+    <svg class="deco" viewBox="0 0 60 40" style="left:13%;bottom:23%;width:9%;max-width:60px">
+      <path d="M10,40 Q8,18 2,10 M22,40 Q22,12 18,4 M32,40 Q34,14 42,6 M44,40 Q48,22 56,16" stroke="#5eae43" stroke-width="5" fill="none" stroke-linecap="round"/>
+    </svg>
+    <svg class="deco" viewBox="0 0 60 40" style="left:56%;bottom:12%;width:8%;max-width:56px">
+      <path d="M10,40 Q8,18 2,10 M22,40 Q22,12 18,4 M32,40 Q34,14 42,6 M44,40 Q48,22 56,16" stroke="#569f3e" stroke-width="5" fill="none" stroke-linecap="round"/>
+    </svg>
+    <svg class="deco" viewBox="0 0 60 60" style="left:70%;bottom:3%;width:8%;max-width:56px">
+      <circle cx="30" cy="24" r="8" fill="#ffd44d"/>
+      <circle cx="30" cy="10" r="7" fill="#fff"/><circle cx="44" cy="20" r="7" fill="#fff"/>
+      <circle cx="39" cy="35" r="7" fill="#fff"/><circle cx="21" cy="35" r="7" fill="#fff"/>
+      <circle cx="16" cy="20" r="7" fill="#fff"/>
+      <path d="M30,34 Q30,52 28,60" stroke="#5eae43" stroke-width="4" fill="none"/>
+    </svg>
+    <svg class="deco" id="tree" viewBox="0 0 320 340" style="right:0;bottom:16%;width:52%;max-width:360px">
+      <rect x="130" y="160" width="38" height="170" rx="15" fill="#a97b52"/>
+      <path d="M149,230 Q190,200 210,190" stroke="#a97b52" stroke-width="16" fill="none" stroke-linecap="round"/>
+      <circle cx="105" cy="125" r="72" fill="#7ecb6f"/>
+      <circle cx="200" cy="105" r="78" fill="#8fd67f"/>
+      <circle cx="150" cy="58" r="62" fill="#9be08a"/>
+      <circle cx="90" cy="90" r="9" fill="#ffb7d5"/><circle cx="180" cy="52" r="9" fill="#ffb7d5"/>
+      <circle cx="235" cy="110" r="9" fill="#ffb7d5"/><circle cx="140" cy="120" r="9" fill="#ffb7d5"/>
+      <g id="swingG" class="swingG">
+        <line x1="222" y1="118" x2="222" y2="252" stroke="#8d6047" stroke-width="6"/>
+        <line x1="268" y1="112" x2="268" y2="252" stroke="#8d6047" stroke-width="6"/>
+        <rect x="206" y="250" width="78" height="14" rx="7" fill="#c98d63" stroke="#a97046" stroke-width="4"/>
+      </g>
+    </svg>
+    <button class="deco tappable obj" data-id="p-swing" style="right:4%;bottom:20%;width:34%;height:30%;background:none"></button>
+    <div id="pond"></div>
+    <button class="obj" data-id="p-duck" style="right:16%;bottom:8%;font-size:36px;z-index:7">🦆</button>
+    <button class="obj" data-id="p-flower1" style="left:6%;bottom:6%;font-size:34px">🌷</button>
+    <button class="obj" data-id="p-flower2" style="left:20%;bottom:3%;font-size:32px">🌼</button>
+    <button class="obj" data-id="p-flower3" style="left:33%;bottom:8%;font-size:32px">🌸</button>
+    <button class="obj" data-id="p-dog" style="left:44%;bottom:5%;font-size:44px">🐶</button>
+    <button class="deco tappable obj" data-id="p-ice" style="left:2%;bottom:26%;width:26%;max-width:170px">
+      <svg viewBox="0 0 180 190" width="100%">
+        <path d="M20,52 Q90,-14 160,52 Z" fill="#ff9ec4" stroke="#e5749b" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M20,52 Q56,36 90,52 Q124,36 160,52" fill="#fff" opacity=".65"/>
+        <rect x="84" y="10" width="8" height="50" fill="#d9a05e"/>
+        <rect x="26" y="58" width="128" height="82" rx="16" fill="#fff2f8" stroke="#eec4da" stroke-width="5"/>
+        <text x="90" y="112" font-size="42" text-anchor="middle">🍦</text>
+        <circle cx="56" cy="152" r="19" fill="#8b7bb5"/><circle cx="56" cy="152" r="8" fill="#cfc4e8"/>
+        <circle cx="124" cy="152" r="19" fill="#8b7bb5"/><circle cx="124" cy="152" r="8" fill="#cfc4e8"/>
+      </svg>
+    </button>
+    <button id="butterfly">🦋</button>
+  </div>
+
+  <!-- ================= WARDROBE ================= -->
+  <div class="scene" id="sc-fit">
+    <div id="fitTop">
+      <div id="fitName">✨ Лили ✨</div>
+      <div id="podium"></div>
+      <div id="fitChar"></div>
+    </div>
+    <div id="fitPanel">
+      <div id="fitTabs"></div>
+      <div id="fitBody"></div>
+    </div>
+  </div>
+
+  <!-- sprite -->
+  <div id="sprite">
+    <div id="bubble"></div>
+    <div class="flip"></div>
+  </div>
+</div>
+
+<div id="nav">
+  <button class="navb sel" data-scene="sc-home"><span class="nicon">🏠</span>Дом</button>
+  <button class="navb" data-scene="sc-fit"><span class="nicon">👗</span>Наряды</button>
+  <button class="navb" data-scene="sc-cafe"><span class="nicon">🧁</span>Кафе</button>
+  <button class="navb" data-scene="sc-park"><span class="nicon">🌳</span>Парк</button>
+</div>
+
+<div id="rotate"><div class="ph">📱</div>Поверни телефон<br>вертикально!</div>
+
+<div id="popup"><div id="popcard">
+  <div class="big">👑</div>
+  <h2>Ура, Лили!</h2>
+  <p>Ты собрала 10 звёздочек!<br>Корона принцессы открыта —<br>найди её в «Нарядах»!</p>
+  <button id="popok">Ура! 🎉</button>
+</div></div>
+
+<script>
+/* ============ STATE ============ */
+const SKINS=[["#ffdcc2","#eebfa0"],["#f0b98c","#d69a6b"],["#c68a5c","#a86e42"]];
+const HAIRC=[["#7a5230","#5d3d20"],["#f7cf7e","#d9a94f"],["#45403f","#2e2a29"],["#ffa5cd","#e57bab"],["#c09be0","#9a72c0"]];
+const DRESSC=[["#ff9ebb","#e5749b"],["#c8a2e8","#a678d0"],["#9fe0c0","#6fbf98"],["#ffd97a","#e0b44f"],["#9fc9f5","#6fa3d8"],["#ff8a80","#d95f57"]];
+const st={skin:0,hair:4,hairC:0,dress:0,dressC:0,shoes:0,acc:0,sound:true,crown:false};
+const stars=new Set();
+const hinted=new Set();
+
+/* ============ CHARACTER ============ */
+function charSVG(uid){
+  const [sk]=SKINS[st.skin];
+  const [hc,hcd]=HAIRC[st.hairC];
+  const [dc,dcd]=DRESSC[st.dressC];
+  let hairExtra="",hairFront="",accSvg="",dressSvg="",shoesSvg="";
+  const hairBack=`<ellipse cx="110" cy="92" rx="64" ry="58" fill="${hc}"/>`;
+  if(st.hair===0){
+    hairExtra=`<path d="M48,90 Q32,190 60,214 Q80,226 84,202 Q72,150 75,110 Z" fill="${hc}"/>
+      <path d="M172,90 Q188,190 160,214 Q140,226 136,202 Q148,150 145,110 Z" fill="${hc}"/>`;
+  }else if(st.hair===1){
+    hairExtra=`<circle cx="33" cy="92" r="23" fill="${hc}"/><ellipse cx="31" cy="124" rx="14" ry="21" fill="${hc}"/>
+      <circle cx="187" cy="92" r="23" fill="${hc}"/><ellipse cx="189" cy="124" rx="14" ry="21" fill="${hc}"/>
+      <circle cx="51" cy="86" r="7" fill="#ff5f96"/><circle cx="169" cy="86" r="7" fill="#ff5f96"/>`;
+  }else if(st.hair===2){
+    hairFront=`<circle cx="62" cy="30" r="19" fill="${hc}" stroke="${hcd}" stroke-width="3.5"/>
+      <circle cx="158" cy="30" r="19" fill="${hc}" stroke="${hcd}" stroke-width="3.5"/>`;
+  }else if(st.hair===3){
+    hairExtra=`<path d="M46,100 Q38,150 62,162 Q76,168 71,142 Q64,120 66,104 Z" fill="${hc}"/>
+      <path d="M174,100 Q182,150 158,162 Q144,168 149,142 Q156,120 154,104 Z" fill="${hc}"/>`;
+  }else{ /* кудряшки: длинные локоны из колечек */
+    hairExtra=`
+      <circle cx="50" cy="118" r="21" fill="${hc}"/><circle cx="42" cy="152" r="20" fill="${hc}"/>
+      <circle cx="48" cy="186" r="19" fill="${hc}"/><circle cx="60" cy="214" r="17" fill="${hc}"/>
+      <circle cx="76" cy="234" r="14" fill="${hc}"/>
+      <circle cx="170" cy="118" r="21" fill="${hc}"/><circle cx="178" cy="152" r="20" fill="${hc}"/>
+      <circle cx="172" cy="186" r="19" fill="${hc}"/><circle cx="160" cy="214" r="17" fill="${hc}"/>
+      <circle cx="144" cy="234" r="14" fill="${hc}"/>
+      <path d="M38,148 a9,9 0 1 1 9,9" stroke="${hcd}" stroke-width="2.5" fill="none" opacity=".5" stroke-linecap="round"/>
+      <path d="M44,184 a8,8 0 1 0 8,-8" stroke="${hcd}" stroke-width="2.5" fill="none" opacity=".5" stroke-linecap="round"/>
+      <path d="M174,148 a9,9 0 1 0 -9,9" stroke="${hcd}" stroke-width="2.5" fill="none" opacity=".5" stroke-linecap="round"/>
+      <path d="M168,184 a8,8 0 1 1 -8,-8" stroke="${hcd}" stroke-width="2.5" fill="none" opacity=".5" stroke-linecap="round"/>
+      <path d="M56,212 a7,7 0 1 1 7,7" stroke="${hcd}" stroke-width="2.5" fill="none" opacity=".5" stroke-linecap="round"/>
+      <path d="M164,212 a7,7 0 1 0 -7,7" stroke="${hcd}" stroke-width="2.5" fill="none" opacity=".5" stroke-linecap="round"/>`;
+    hairFront=`<circle cx="64" cy="176" r="12" fill="${hc}"/><circle cx="156" cy="176" r="12" fill="${hc}"/>`;
+  }
+  let bangs=`<path d="M50,98 Q44,26 110,22 Q176,26 170,98 Q165,102 159,92 Q157,62 139,68 Q129,48 109,60 Q88,48 79,68 Q62,62 61,92 Q55,102 50,98 Z" fill="${hc}"/>`;
+  if(st.hair===4){ /* пышная кудрявая чёлка */
+    bangs+=`<circle cx="74" cy="72" r="11" fill="${hc}"/><circle cx="94" cy="61" r="11" fill="${hc}"/>
+      <circle cx="113" cy="57" r="11" fill="${hc}"/><circle cx="132" cy="61" r="11" fill="${hc}"/>
+      <circle cx="150" cy="72" r="11" fill="${hc}"/>
+      <path d="M88,64 a6,6 0 1 1 6,6" stroke="${hcd}" stroke-width="2" fill="none" opacity=".45" stroke-linecap="round"/>
+      <path d="M128,64 a6,6 0 1 0 -6,6" stroke="${hcd}" stroke-width="2" fill="none" opacity=".45" stroke-linecap="round"/>`;
+  }
+  if(st.dress===0){
+    dressSvg=`<path d="M84,150 Q110,142 136,150 L154,232 Q110,247 66,232 Z" fill="${dc}" stroke="${dcd}" stroke-width="3.5" stroke-linejoin="round"/>
+      <circle cx="97" cy="187" r="4" fill="#fff" opacity=".85"/><circle cx="119" cy="202" r="4" fill="#fff" opacity=".85"/>
+      <circle cx="103" cy="220" r="4" fill="#fff" opacity=".85"/>
+      <path d="M100,153 Q110,161 120,153" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+  }else if(st.dress===1){
+    dressSvg=`<path d="M84,150 Q110,142 136,150 L152,220 Q147,237 136,226 Q129,242 117,230 Q110,244 101,230 Q90,242 83,226 Q73,237 68,220 Z" fill="${dc}" stroke="${dcd}" stroke-width="3.5" stroke-linejoin="round"/>
+      <rect x="85" y="182" width="50" height="10" rx="5" fill="${dcd}"/>
+      <path d="M100,153 Q110,161 120,153" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>`;
+  }else{
+    dressSvg=`<path d="M86,150 Q110,143 134,150 L137,194 L83,194 Z" fill="#fff" stroke="#e3d4ea" stroke-width="3.5" stroke-linejoin="round"/>
+      <circle cx="110" cy="166" r="5" fill="${dc}"/><circle cx="110" cy="182" r="5" fill="${dc}"/>
+      <path d="M78,192 L142,192 Q153,216 149,232 Q110,245 71,232 Q67,216 78,192 Z" fill="${dc}" stroke="${dcd}" stroke-width="3.5" stroke-linejoin="round"/>
+      <path d="M96,194 L92,229 M110,195 L110,233 M124,194 L128,229" stroke="${dcd}" stroke-width="2" opacity=".5" fill="none"/>`;
+  }
+  if(st.shoes===0){
+    shoesSvg=`<rect x="82" y="274" width="26" height="17" rx="8" fill="#fff" stroke="#dcd3e8" stroke-width="2.5"/>
+      <path d="M83,283 h24" stroke="${dc}" stroke-width="3.5"/>
+      <rect x="112" y="274" width="26" height="17" rx="8" fill="#fff" stroke="#dcd3e8" stroke-width="2.5"/>
+      <path d="M113,283 h24" stroke="${dc}" stroke-width="3.5"/>`;
+  }else if(st.shoes===1){
+    shoesSvg=`<ellipse cx="95" cy="284" rx="14" ry="8.5" fill="${dcd}"/><ellipse cx="125" cy="284" rx="14" ry="8.5" fill="${dcd}"/>
+      <circle cx="95" cy="277" r="3" fill="#fff"/><circle cx="125" cy="277" r="3" fill="#fff"/>`;
+  }else{
+    shoesSvg=`<rect x="84" y="258" width="22" height="34" rx="9" fill="#a9795f" stroke="#8d6047" stroke-width="2.5"/>
+      <rect x="114" y="258" width="22" height="34" rx="9" fill="#a9795f" stroke="#8d6047" stroke-width="2.5"/>
+      <path d="M85,268 h20 M115,268 h20" stroke="#8d6047" stroke-width="2.5" fill="none"/>`;
+  }
+  if(st.acc===1){
+    accSvg=`<path d="M108,30 Q82,10 84,34 Q86,50 108,36 Z" fill="#ff5f96" stroke="#e0417c" stroke-width="2.5"/>
+      <path d="M112,30 Q138,10 136,34 Q134,50 112,36 Z" fill="#ff5f96" stroke="#e0417c" stroke-width="2.5"/>
+      <circle cx="110" cy="33" r="8" fill="#ff7fae" stroke="#e0417c" stroke-width="2.5"/>`;
+  }else if(st.acc===2){
+    accSvg=`<path d="M58,48 L70,6 L96,32 Z" fill="${hc}" stroke="${hcd}" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M67,39 L73,19 L86,32 Z" fill="#ffb0c9"/>
+      <path d="M162,48 L150,6 L124,32 Z" fill="${hc}" stroke="${hcd}" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M153,39 L147,19 L134,32 Z" fill="#ffb0c9"/>`;
+  }else if(st.acc===3){
+    accSvg=`<circle cx="88" cy="98" r="16" fill="rgba(255,255,255,.3)" stroke="#6d5b8e" stroke-width="3.5"/>
+      <circle cx="132" cy="98" r="16" fill="rgba(255,255,255,.3)" stroke="#6d5b8e" stroke-width="3.5"/>
+      <path d="M104,98 Q110,93 116,98" stroke="#6d5b8e" stroke-width="3.5" fill="none"/>`;
+  }else if(st.acc===4){
+    accSvg=`<path d="M76,36 L84,8 L98,26 L110,2 L122,26 L136,8 L144,36 Q110,46 76,36 Z" fill="#ffd44d" stroke="#e8a93a" stroke-width="3" stroke-linejoin="round"/>
+      <circle cx="93" cy="31" r="3.5" fill="#ff5f96"/><circle cx="110" cy="33" r="3.5" fill="#5fc9ff"/><circle cx="127" cy="31" r="3.5" fill="#7ee08a"/>`;
+  }
+  const legs=`<line x1="95" y1="222" x2="95" y2="278" stroke="${sk}" stroke-width="15" stroke-linecap="round"/>
+    <line x1="125" y1="222" x2="125" y2="278" stroke="${sk}" stroke-width="15" stroke-linecap="round"/>`;
+  const arms=`<path d="M90,158 Q64,172 57,198" stroke="${sk}" stroke-width="13" fill="none" stroke-linecap="round"/>
+    <path d="M130,158 Q156,172 163,198" stroke="${sk}" stroke-width="13" fill="none" stroke-linecap="round"/>`;
+  const eye=(cx,dir)=>{
+    const ox=cx+11*dir;
+    return `<ellipse cx="${cx}" cy="99" rx="12" ry="14" fill="#fff"/>
+    <ellipse cx="${cx}" cy="100" rx="9.5" ry="12" fill="url(#iris-${uid})"/>
+    <ellipse cx="${cx}" cy="101.5" rx="5.5" ry="7.5" fill="#2a1a0e"/>
+    <circle cx="${cx+3.5}" cy="94.5" r="3.6" fill="#fff"/>
+    <circle cx="${cx-3}" cy="105" r="1.9" fill="#fff" opacity=".85"/>
+    <path d="M${cx-11},91 Q${cx},83 ${cx+11},91" stroke="#3a2a1e" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <path d="M${ox},90.5 Q${ox+5*dir},87 ${ox+9*dir},87.5" stroke="#3a2a1e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M${ox-0.5*dir},93 Q${ox+5*dir},91.5 ${ox+9.5*dir},93.5" stroke="#3a2a1e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M${ox-1.5*dir},88.5 Q${ox+2*dir},84 ${ox+4.5*dir},82.5" stroke="#3a2a1e" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+  };
+  const head=`<rect x="101" y="130" width="18" height="22" rx="7" fill="${sk}"/>
+    <ellipse cx="110" cy="95" rx="57" ry="53" fill="${sk}"/>
+    ${eye(88,-1)}${eye(132,1)}
+    <ellipse cx="68" cy="118" rx="8" ry="4.5" fill="#ffa8bd" opacity=".65"/>
+    <ellipse cx="152" cy="118" rx="8" ry="4.5" fill="#ffa8bd" opacity=".65"/>
+    <path d="M101,123 Q110,132 119,123" stroke="#d15b6e" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
+  return `<svg viewBox="0 0 220 320" xmlns="http://www.w3.org/2000/svg">
+    <defs><radialGradient id="iris-${uid}" cx="50%" cy="38%" r="75%">
+      <stop offset="0%" stop-color="#bda45c"/><stop offset="55%" stop-color="#7d8348"/><stop offset="100%" stop-color="#50592e"/>
+    </radialGradient></defs>
+    ${hairBack}${hairExtra}${legs}${shoesSvg}${dressSvg}${arms}${head}${bangs}${hairFront}${accSvg}</svg>`;
+}
+function renderChar(){
+  document.querySelector("#sprite .flip").innerHTML=charSVG("s");
+  document.getElementById("fitChar").innerHTML=charSVG("f");
+}
+
+/* ============ SOUND ============ */
+let AC=null;
+function ac(){ if(!AC){ try{AC=new (window.AudioContext||window.webkitAudioContext)();}catch(e){} } return AC; }
+function tone(f1,dur,opts={}){
+  if(!st.sound)return; const a=ac(); if(!a)return;
+  const {f2=f1,type="sine",vol=.14,delay=0}=opts;
+  const o=a.createOscillator(),g=a.createGain();
+  o.type=type;o.connect(g);g.connect(a.destination);
+  const t=a.currentTime+delay;
+  o.frequency.setValueAtTime(f1,t);
+  if(f2!==f1)o.frequency.exponentialRampToValueAtTime(f2,t+dur);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.02);
+  g.gain.exponentialRampToValueAtTime(.001,t+dur);
+  o.start(t);o.stop(t+dur+.05);
+}
+const S={
+  pop(){tone(520,.12);tone(880,.1,{delay:.06});},
+  meow(){tone(760,.28,{f2:420,type:"triangle",vol:.12});},
+  bark(){tone(220,.1,{type:"square",vol:.08});tone(180,.12,{type:"square",vol:.08,delay:.12});},
+  quack(){tone(320,.12,{f2:260,type:"sawtooth",vol:.06});tone(320,.12,{f2:260,type:"sawtooth",vol:.06,delay:.15});},
+  chirp(){tone(1400,.09,{f2:1900});tone(1600,.09,{f2:2100,delay:.12});},
+  yum(){tone(440,.1);tone(550,.1,{delay:.09});tone(660,.14,{delay:.18});},
+  star(){tone(660,.12);tone(880,.12,{delay:.09});tone(1180,.2,{delay:.18});},
+  whee(){tone(400,.5,{f2:900,type:"triangle",vol:.1});},
+  night(){tone(500,.3,{f2:250,type:"sine",vol:.1});},
+  melody(){[523,587,659,784,659,880,784].forEach((n,i)=>tone(n,.16,{delay:i*.17,type:"triangle",vol:.11}));},
+  fanfare(){[523,659,784,1047].forEach((n,i)=>tone(n,.25,{delay:i*.13,type:"triangle",vol:.14}));}
+};
+document.getElementById("sndbtn").addEventListener("click",e=>{
+  st.sound=!st.sound; e.target.textContent=st.sound?"🔊":"🔇"; if(st.sound)S.pop();
+});
+
+/* ============ HELPERS ============ */
+const stage=document.getElementById("stage");
+const sprite=document.getElementById("sprite");
+function burst(x,y,emojis,n=7){
+  for(let i=0;i<n;i++){
+    const p=document.createElement("span");
+    p.className="pt";p.textContent=emojis[i%emojis.length];
+    const ang=Math.random()*Math.PI*2,r=40+Math.random()*55;
+    p.style.setProperty("--dx",Math.cos(ang)*r+"px");
+    p.style.setProperty("--dy",(Math.sin(ang)*r-30)+"px");
+    p.style.left=x+"px";p.style.top=y+"px";
+    stage.appendChild(p);setTimeout(()=>p.remove(),950);
+  }
+}
+function burstAt(el,emojis,n){
+  const r=el.getBoundingClientRect(),s=stage.getBoundingClientRect();
+  burst(r.left-s.left+r.width/2,r.top-s.top+r.height/2,emojis,n);
+}
+function say(text,ms=1600){
+  const b=document.getElementById("bubble");
+  b.textContent=text;b.classList.add("show");
+  clearTimeout(say._t);say._t=setTimeout(()=>b.classList.remove("show"),ms);
+}
+function miniSay(el,text){
+  const r=el.getBoundingClientRect(),s=stage.getBoundingClientRect();
+  const m=document.createElement("div");m.className="minisay";m.textContent=text;
+  m.style.left=(r.left-s.left+r.width/2-30)+"px";
+  m.style.top=(r.top-s.top-30)+"px";
+  stage.appendChild(m);setTimeout(()=>m.remove(),1450);
+}
+function boing(el){el.classList.remove("boing");void el.offsetWidth;el.classList.add("boing");}
+function flyToLily(el,emoji,phrase){
+  const r=el.getBoundingClientRect(),sp=sprite.getBoundingClientRect();
+  const f=document.createElement("span");f.className="starfly";f.textContent=emoji;
+  f.style.left=r.left+r.width/2+"px";f.style.top=r.top+"px";
+  document.body.appendChild(f);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    f.style.left=(sp.left+sp.width/2)+"px";f.style.top=(sp.top+10)+"px";
+    f.style.transform="scale(.5)";f.style.opacity="0";
+  }));
+  setTimeout(()=>{f.remove();say(phrase);S.yum();
+    const s=stage.getBoundingClientRect(),sp2=sprite.getBoundingClientRect();
+    burst(sp2.left-s.left+sp2.width/2,sp2.top-s.top+30,["❤️","✨"],6);
+  },820);
+}
+
+/* ============ STARS ============ */
+function giveStar(id,el){
+  if(stars.has(id))return; stars.add(id);
+  const box=document.getElementById("starbox");
+  const r=el.getBoundingClientRect();
+  const f=document.createElement("span");f.className="starfly";f.textContent="⭐";
+  f.style.left=r.left+r.width/2+"px";f.style.top=r.top+"px";
+  document.body.appendChild(f);
+  const b=box.getBoundingClientRect();
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    f.style.left=b.left+b.width/2+"px";f.style.top=b.top+"px";f.style.transform="scale(.6)";
+  }));
+  setTimeout(()=>{
+    f.remove();
+    document.getElementById("starN").textContent=Math.min(stars.size,10);
+    box.classList.add("bump");setTimeout(()=>box.classList.remove("bump"),220);
+    S.star();
+    if(stars.size>=10&&!st.crown){st.crown=true;unlockCrown();}
+  },830);
+}
+function unlockCrown(){
+  S.fanfare();
+  document.getElementById("popup").classList.add("show");
+  const s=stage.getBoundingClientRect();
+  for(let i=0;i<3;i++)setTimeout(()=>burst(s.width*Math.random(),s.height*.3*Math.random()+40,["🎉","✨","⭐","🎊"],8),i*260);
+  buildFitBody();
+}
+document.getElementById("popok").addEventListener("click",()=>{
+  document.getElementById("popup").classList.remove("show");
+});
+
+/* ============ SCENES & NAV ============ */
+let curScene=document.getElementById("sc-home");
+function showScene(id){
+  document.querySelectorAll(".scene").forEach(s=>s.classList.remove("active"));
+  curScene=document.getElementById(id);
+  curScene.classList.add("active");
+  document.querySelectorAll(".navb").forEach(b=>b.classList.toggle("sel",b.dataset.scene===id));
+  if(id!=="sc-fit"){
+    curScene.appendChild(sprite);sprite.style.display="block";
+    sprite.classList.remove("walking");
+    sprite.style.transition="none";
+    sprite.style.left=(curScene.clientWidth*.42)+"px";
+    if(!hinted.has(id)){
+      hinted.add(id);
+      const h=document.createElement("div");h.className="hint";
+      h.textContent=id==="sc-home"?"Нажимай на предметы — они оживают! ✨":"Нажимай на всё вокруг! ✨";
+      curScene.appendChild(h);setTimeout(()=>h.remove(),4100);
+    }
+  }else{
+    sprite.style.display="none";
+    renderChar();
+  }
+  S.pop();
+}
+document.querySelectorAll(".navb").forEach(b=>b.addEventListener("click",()=>showScene(b.dataset.scene)));
+
+/* ============ WALKING ============ */
+document.querySelectorAll(".scene").forEach(sc=>{
+  if(sc.id==="sc-fit")return;
+  sc.addEventListener("click",e=>{
+    if(e.target.closest(".obj")||e.target.closest("#butterfly"))return;
+    const rect=sc.getBoundingClientRect();
+    let x=e.clientX-rect.left-sprite.offsetWidth/2;
+    x=Math.max(4,Math.min(rect.width-sprite.offsetWidth-4,x));
+    const cur=parseFloat(sprite.style.left)||0;
+    const dist=Math.abs(x-cur); if(dist<8)return;
+    sprite.classList.toggle("left",x<cur);
+    sprite.style.setProperty("--fx",x<cur?-1:1);
+    sprite.style.transition=`left ${Math.max(.35,dist/240)}s linear`;
+    sprite.classList.add("walking");
+    requestAnimationFrame(()=>{sprite.style.left=x+"px";});
+    clearTimeout(sprite._wt);
+    sprite._wt=setTimeout(()=>sprite.classList.remove("walking"),Math.max(350,dist/240*1000));
+  });
+});
+
+/* ============ OBJECT ACTIONS ============ */
+const ACTIONS={
+  "h-cat":(el)=>{S.meow();miniSay(el,"Мяу! 🐾");burstAt(el,["❤️","💗"],6);},
+  "h-bear":(el)=>{S.pop();miniSay(el,"Обнимашки!");burstAt(el,["❤️","🧡"],6);},
+  "h-bed":(el)=>{S.night();miniSay(el,"Тс-с-с...");burstAt(el,["💤","🌙"],5);},
+  "h-window":(el)=>{S.chirp();burstAt(el,["🐦","☀️","✨"],5);},
+  "h-pic":(el)=>{S.pop();burstAt(el,["💘","💗","💖"],6);},
+  "h-lamp":(el)=>{
+    const h=document.getElementById("sc-home");h.classList.toggle("night");
+    S.night();if(h.classList.contains("night"))burstAt(el,["🌙","⭐","✨"],6);else burstAt(el,["☀️","✨"],4);
+  },
+  "c-bear":(el)=>{S.pop();miniSay(el,"Добро пожаловать!");burstAt(el,["💕"],4);},
+  "c-cake":(el)=>flyToLily(el,"🍰","Ням-ням! 😋"),
+  "c-cup":(el)=>flyToLily(el,"🧁","Как вкусно!"),
+  "c-donut":(el)=>flyToLily(el,"🍩","Объедение!"),
+  "c-cookie":(el)=>flyToLily(el,"🍪","Хрум-хрум!"),
+  "c-juice":(el)=>flyToLily(el,"🧃","Буль-буль!"),
+  "c-radio":(el)=>{S.melody();boing(el);burstAt(el,["🎵","🎶","💃"],7);},
+  "p-swing":(el)=>{
+    S.whee();const g=document.getElementById("swingG");
+    g.classList.remove("go");void g.getBBox&&g.getBoundingClientRect();g.classList.add("go");
+    setTimeout(()=>g.classList.remove("go"),3400);
+    sprite.classList.remove("jump");void sprite.offsetWidth;sprite.classList.add("jump");
+    say("Ви-и-и! 🎉");
+  },
+  "p-duck":(el)=>{S.quack();miniSay(el,"Кря-кря!");burstAt(el,["💦","💧"],6);},
+  "p-dog":(el)=>{S.bark();miniSay(el,"Гав-гав!");burstAt(el,["❤️","🐾"],6);},
+  "p-flower1":(el)=>{S.pop();burstAt(el,["🌸","✨","🌷"],6);},
+  "p-flower2":(el)=>{S.pop();burstAt(el,["🌼","✨","🐝"],6);},
+  "p-flower3":(el)=>{S.pop();burstAt(el,["🌸","💮","✨"],6);},
+  "p-ice":(el)=>flyToLily(el,"🍦","Мороженое! 🍦")
+};
+document.querySelectorAll(".obj[data-id]").forEach(el=>{
+  el.addEventListener("click",e=>{
+    e.stopPropagation();
+    const id=el.dataset.id;
+    boing(el);
+    (ACTIONS[id]||((x)=>{S.pop();burstAt(x,["✨"],5);}))(el);
+    giveStar(id,el);
+  });
+});
+document.getElementById("butterfly").addEventListener("click",e=>{
+  e.stopPropagation();S.pop();burstAt(e.target,["✨","💫"],7);giveStar("p-butterfly",e.target);
+});
+
+/* ============ WARDROBE UI ============ */
+const TABS=[
+  {id:"hair",icon:"💇‍♀️",name:"Волосы",rows:[
+    {label:"ПРИЧЁСКА",key:"hair",opts:["Длинные","Хвостики","Пучки","Каре","Кудряшки"]},
+    {label:"ЦВЕТ ВОЛОС",key:"hairC",colors:HAIRC}]},
+  {id:"dress",icon:"👗",name:"Наряд",rows:[
+    {label:"ФАСОН",key:"dress",opts:["Платье","С рюшами","Топ и юбка"]},
+    {label:"ЦВЕТ",key:"dressC",colors:DRESSC}]},
+  {id:"shoes",icon:"👟",name:"Обувь",rows:[
+    {label:"ОБУВЬ",key:"shoes",opts:["Кеды","Балетки","Сапожки"]}]},
+  {id:"acc",icon:"🎀",name:"Разное",rows:[
+    {label:"АКСЕССУАР",key:"acc",opts:["Ничего","Бантик","Ушки","Очки","Корона"]},
+    {label:"ОТТЕНОК КОЖИ",key:"skin",colors:SKINS}]}
+];
+let curTab="hair";
+const fitTabs=document.getElementById("fitTabs");
+TABS.forEach(t=>{
+  const b=document.createElement("button");
+  b.className="tab"+(t.id===curTab?" sel":"");
+  b.innerHTML=`<span class="ticon">${t.icon}</span>${t.name}`;
+  b.addEventListener("click",()=>{curTab=t.id;
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("sel"));
+    b.classList.add("sel");buildFitBody();S.pop();});
+  fitTabs.appendChild(b);
+});
+function sparkleChar(){
+  const el=document.getElementById("fitChar");
+  const r=el.getBoundingClientRect(),s=stage.getBoundingClientRect();
+  burst(r.left-s.left+r.width/2,r.top-s.top+r.height/2,["✨","💖","⭐"],6);
+}
+function buildFitBody(){
+  const tab=TABS.find(t=>t.id===curTab);
+  const body=document.getElementById("fitBody");
+  body.innerHTML="";
+  tab.rows.forEach(row=>{
+    const lab=document.createElement("div");lab.className="rowlabel";lab.textContent=row.label;
+    body.appendChild(lab);
+    const wrap=document.createElement("div");wrap.className="optrow";
+    if(row.opts){
+      row.opts.forEach((name,i)=>{
+        const locked=(row.key==="acc"&&i===4&&!st.crown);
+        const o=document.createElement("button");
+        o.className="opt"+(st[row.key]===i?" sel":"")+(locked?" locked":"");
+        o.innerHTML=locked?`🔒 ${name}`:name;
+        o.addEventListener("click",()=>{
+          if(locked){miniSay(o,"Собери 10 ⭐!");S.pop();return;}
+          st[row.key]=i;renderChar();buildFitBody();S.pop();sparkleChar();
+        });
+        wrap.appendChild(o);
+      });
+    }else{
+      row.colors.forEach((c,i)=>{
+        const d=document.createElement("button");
+        d.className="dot"+(st[row.key]===i?" sel":"");
+        d.style.background=c[0];
+        d.addEventListener("click",()=>{st[row.key]=i;renderChar();buildFitBody();S.pop();sparkleChar();});
+        wrap.appendChild(d);
+      });
+    }
+    body.appendChild(wrap);
+  });
+}
+
+/* ============ INIT ============ */
+/* офлайн-режим (PWA): работает только по https, локально просто пропускается */
+if("serviceWorker" in navigator && location.protocol === "https:"){
+  navigator.serviceWorker.register("./sw.js").catch(()=>{});
+}
+/* Надёжная высота для встроенных браузеров (Telegram, VK и т.п.):
+   их панели перекрывают 100vh, поэтому меряем видимую область сами */
+function setVH(){
+  const h=(window.visualViewport&&window.visualViewport.height)||window.innerHeight;
+  if(h)document.body.style.height=Math.round(h)+"px";
+}
+setVH();
+window.addEventListener("resize",setVH);
+window.addEventListener("orientationchange",()=>setTimeout(setVH,250));
+if(window.visualViewport)window.visualViewport.addEventListener("resize",setVH);
+/* запрет прокрутки-баунса внутри webview */
+document.addEventListener("touchmove",e=>{
+  if(!e.target.closest("#fitBody"))e.preventDefault();
+},{passive:false});
+if(window.innerWidth>=640){
+  document.querySelectorAll(".obj").forEach(o=>{
+    const fs=parseFloat(o.style.fontSize);
+    if(fs)o.style.fontSize=Math.round(fs*1.35)+"px";
+  });
+}
+renderChar();
+buildFitBody();
+window.addEventListener("resize",()=>{
+  if(curScene&&curScene.id!=="sc-fit"){
+    const w=curScene.clientWidth;
+    let x=parseFloat(sprite.style.left)||0;
+    sprite.style.transition="none";
+    sprite.style.left=Math.min(x,w-sprite.offsetWidth-4)+"px";
+  }
+});
+showScene("sc-home");
+</script>
+</body>
+</html>
