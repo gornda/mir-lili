@@ -202,19 +202,47 @@ body{
 .dot{width:38px;height:38px;border-radius:50%;border:4px solid #f0e2ec;cursor:pointer}
 .dot.sel{border-color:#ff86b5;box-shadow:0 0 0 3px #ffd7e8}
 /* ---------- NAV ---------- */
-#nav{flex:0 0 68px;display:flex;background:#fff;box-shadow:0 -3px 0 #f3d7e6;z-index:50;padding:6px 8px;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px));gap:6px}
+#nav{flex:0 0 68px;display:flex;background:#fff;box-shadow:0 -3px 0 #f3d7e6;z-index:50;padding:6px 6px;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px));gap:4px}
+.navb{min-width:0;font-size:11px}
 .navb{flex:1;border:none;border-radius:16px;background:#fdf3f8;cursor:pointer;font-family:inherit;
   font-weight:800;color:#bb87ab;font-size:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
 .navb .nicon{font-size:24px;line-height:1}
 .navb.sel{background:linear-gradient(180deg,#ff9ec4,#ff86b5);color:#fff;box-shadow:0 3px 0 #e5749b}
+/* ---------- SHOP ---------- */
+#sc-shop .wall{bottom:24%;background:#fdf2ff;background-image:radial-gradient(circle at 12px 12px,#f0d8f5 6px,transparent 7px);background-size:66px 66px}
+#sc-shop .floor{height:24%;background:repeating-linear-gradient(90deg,#ecd8f2 0 64px,#e2c9ea 64px 68px);box-shadow:inset 0 6px 0 rgba(190,150,210,.45)}
+.shopname{position:absolute;top:9%;left:50%;transform:translateX(-50%);background:#fff;color:#c05a92;font-weight:800;font-size:15px;padding:5px 14px;border-radius:16px;box-shadow:0 3px 0 rgba(220,150,185,.4);z-index:4;white-space:nowrap}
+/* ---------- CINEMA ---------- */
+#sc-cine .wall{bottom:20%;background-color:#2c2258;background-image:radial-gradient(circle at 20px 20px,rgba(255,255,255,.22) 2px,transparent 3px),linear-gradient(180deg,#3a2e6e,#241c4a);background-size:110px 110px,100% 100%}
+#sc-cine .floor{height:20%;background:linear-gradient(180deg,#4a3a80,#3a2e66);box-shadow:inset 0 6px 0 rgba(30,20,70,.5)}
+#screenBox{position:absolute;left:6%;right:6%;top:5%;height:33%;background:#fff7fb;border:6px solid #ffd97a;border-radius:14px;box-shadow:0 0 30px 6px rgba(255,217,122,.35);overflow:hidden;padding:0;z-index:4}
+#film{position:absolute;inset:0;background:linear-gradient(180deg,#ffeef8,#e8f4ff);pointer-events:none}
+#film .fbg{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);font-size:64px;opacity:.45}
+#film .fmv{position:absolute;bottom:6%;left:-18%;font-size:46px;animation:filmmove 6s linear infinite}
+@keyframes filmmove{from{left:-18%}to{left:104%}}
+.seatrow{position:absolute;left:0;width:100%;pointer-events:none}
+/* ---------- UNICORN ---------- */
+#unicorn svg{animation:unibob 3s ease-in-out infinite}
+@keyframes unibob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+/* ---------- HOME DECOR ---------- */
+#sc-home.t1 .wall{background:#eafef2;background-image:radial-gradient(circle at 12px 12px,#c2ecd8 7px,transparent 8px);background-size:64px 64px}
+#sc-home.t2 .wall{background:#f1ecff;background-image:radial-gradient(circle at 12px 12px,#d9cdf6 7px,transparent 8px);background-size:64px 64px}
+#sc-home.t3 .wall{background:#fff3e9;background-image:radial-gradient(circle at 12px 12px,#ffdcc0 7px,transparent 8px);background-size:64px 64px}
+#rug{border:none;cursor:pointer}
+#rug.r1{background:radial-gradient(ellipse,#d6e9ff 0 38%,#b5d5f8 39% 68%,#94c3f0 69% 100%)}
+#rug.r2{background:radial-gradient(ellipse,#d8f5e6 0 38%,#b5e8cf 39% 68%,#93d9b8 69% 100%)}
+#rug.r3{background:radial-gradient(ellipse,#e9def8 0 38%,#d4c2f0 39% 68%,#bda3e6 69% 100%)}
+#toys{position:absolute;inset:0;pointer-events:none;z-index:5}
+.toy{position:absolute;font-size:30px;z-index:5;pointer-events:none;animation:toyin .5s cubic-bezier(.2,1.6,.5,1);filter:drop-shadow(0 3px 2px rgba(150,90,120,.25))}
+@keyframes toyin{from{transform:scale(0) rotate(-30deg)}to{transform:scale(1) rotate(0)}}
 /* ---------- RESPONSIVE ---------- */
 @media (max-width:374px){
   #topbar .title{font-size:16px}
   #starbox{font-size:14px;padding:3px 9px}
   #sndbtn{width:32px;height:32px;font-size:15px}
-  #nav{flex:0 0 62px}
-  .navb{font-size:11px}
-  .navb .nicon{font-size:21px}
+  #nav{flex:0 0 60px;gap:3px;padding-left:4px;padding-right:4px}
+  .navb{font-size:9px}
+  .navb .nicon{font-size:19px}
   .tab{font-size:12px}
   .opt{padding:7px 9px;font-size:13px}
   .dot{width:34px;height:34px}
@@ -322,9 +350,19 @@ body{
         <ellipse cx="50" cy="196" rx="36" ry="13" fill="#c9b8dd"/>
       </svg>
     </button>
-    <div id="rug"></div>
+    <button class="obj" id="rug" data-id="h-rug"></button>
+    <div id="toys"></div>
     <button class="obj" data-id="h-cat" style="left:65%;bottom:8%;font-size:52px">🐱</button>
     <button class="obj" data-id="h-bear" style="right:19%;bottom:39%;font-size:42px">🧸</button>
+    <button class="obj" data-id="h-paint" style="right:4%;top:34%;font-size:36px">🎨</button>
+    <button class="deco tappable obj" data-id="h-toybox" style="right:2%;bottom:3%;width:19%;max-width:130px">
+      <svg viewBox="0 0 160 120" width="100%">
+        <path d="M12,38 Q12,14 34,14 H126 Q148,14 148,38 L148,44 H12 Z" fill="#e79fc0" stroke="#d07ba6" stroke-width="5"/>
+        <rect x="12" y="44" width="136" height="68" rx="12" fill="#f3b7d4" stroke="#d07ba6" stroke-width="5"/>
+        <rect x="68" y="36" width="24" height="20" rx="6" fill="#ffd44d" stroke="#e8a93a" stroke-width="4"/>
+        <path d="M80,78 c-6,-9 -19,-4 -15,7 c3,7 15,13 15,13 c0,0 12,-6 15,-13 c4,-11 -9,-16 -15,-7 Z" fill="#fff" opacity=".85"/>
+      </svg>
+    </button>
     <div id="lampglow" style="right:-52px;bottom:16%"></div>
     <div id="blanket"></div>
     <div id="night"></div>
@@ -362,15 +400,20 @@ body{
       <div class="mrow">🍪 🧃 ♥</div>
     </div>
     <div id="counter">
-      <button class="obj" data-id="c-bear" style="left:12%;bottom:94%;font-size:58px;z-index:1">🐻</button>
-      <button class="obj" data-id="c-radio" style="right:3%;bottom:100%;font-size:34px;z-index:3">📻</button>
+      <button class="obj" data-id="c-bear" style="left:8%;bottom:94%;font-size:58px;z-index:1">🐻</button>
+      <button class="obj" data-id="c-boba" style="left:38%;bottom:100%;font-size:32px;z-index:3">🧋</button>
+      <button class="obj" data-id="c-shake" style="left:55%;bottom:100%;font-size:32px;z-index:3">🥤</button>
+      <button class="obj" data-id="c-tea" style="left:71%;bottom:100%;font-size:30px;z-index:3">🍵</button>
+      <button class="obj" data-id="c-radio" style="right:2%;bottom:100%;font-size:34px;z-index:3">📻</button>
       <div class="ctop"></div>
       <div class="front">
         <div class="case">
-          <button class="obj" data-id="c-cake" style="font-size:38px">🍰</button>
-          <button class="obj" data-id="c-cup" style="font-size:36px">🧁</button>
-          <button class="obj" data-id="c-donut" style="font-size:36px">🍩</button>
-          <button class="obj" data-id="c-cookie" style="font-size:34px">🍪</button>
+          <button class="obj" data-id="c-cake" style="font-size:36px">🍰</button>
+          <button class="obj" data-id="c-cup" style="font-size:34px">🧁</button>
+          <button class="obj" data-id="c-donut" style="font-size:34px">🍩</button>
+          <button class="obj" data-id="c-cookie" style="font-size:32px">🍪</button>
+          <button class="obj" data-id="c-crois" style="font-size:34px">🥐</button>
+          <button class="obj" data-id="c-berry" style="font-size:32px">🍓</button>
         </div>
         <div class="heartrow">♥ ♥ ♥</div>
       </div>
@@ -445,6 +488,132 @@ body{
       </svg>
     </button>
     <button id="butterfly">🦋</button>
+    <button class="deco tappable obj" id="unicorn" data-id="p-uni" style="left:26%;bottom:24%;width:24%;max-width:170px">
+      <svg viewBox="0 0 220 190" width="100%">
+        <circle cx="28" cy="92" r="13" fill="#ff9ec4"/><circle cx="20" cy="112" r="12" fill="#ffd97a"/>
+        <circle cx="30" cy="131" r="11" fill="#9fe0c0"/><circle cx="22" cy="149" r="10" fill="#9fc9f5"/>
+        <rect x="55" y="126" width="17" height="54" rx="8.5" fill="#fff" stroke="#e6daf0" stroke-width="3"/>
+        <rect x="88" y="131" width="17" height="50" rx="8.5" fill="#fff" stroke="#e6daf0" stroke-width="3"/>
+        <rect x="117" y="131" width="17" height="50" rx="8.5" fill="#fff" stroke="#e6daf0" stroke-width="3"/>
+        <rect x="145" y="126" width="17" height="54" rx="8.5" fill="#fff" stroke="#e6daf0" stroke-width="3"/>
+        <ellipse cx="105" cy="103" rx="72" ry="42" fill="#fff" stroke="#eadef5" stroke-width="4"/>
+        <path d="M146,90 Q148,52 170,38 L188,52 Q190,80 160,100 Z" fill="#fff" stroke="#eadef5" stroke-width="4" stroke-linejoin="round"/>
+        <ellipse cx="182" cy="46" rx="27" ry="21" fill="#fff" stroke="#eadef5" stroke-width="4"/>
+        <path d="M164,30 L169,10 L180,26 Z" fill="#fff" stroke="#eadef5" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M168,26 L179,14 L176,29 Z" fill="#ffc9d8"/>
+        <path d="M184,26 L198,0 L199,28 Z" fill="#ffd44d" stroke="#e8a93a" stroke-width="3" stroke-linejoin="round"/>
+        <circle cx="152" cy="30" r="13" fill="#ff9ec4"/><circle cx="142" cy="48" r="13" fill="#c8a2e8"/>
+        <circle cx="136" cy="67" r="12" fill="#ff9ec4"/><circle cx="134" cy="86" r="11" fill="#c8a2e8"/>
+        <circle cx="188" cy="46" r="4.5" fill="#3a2a3e"/><circle cx="190" cy="44" r="1.7" fill="#fff"/>
+        <path d="M193,39 Q197,36 200,37" stroke="#3a2a3e" stroke-width="2" fill="none" stroke-linecap="round"/>
+        <ellipse cx="176" cy="57" rx="6.5" ry="3.5" fill="#ffc9d8" opacity=".85"/>
+        <circle cx="201" cy="53" r="2" fill="#dfa3b5"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ================= SHOP ================= -->
+  <div class="scene" id="sc-shop" style="--sb:5%">
+    <div class="wall"></div>
+    <div class="floor"></div>
+    <svg class="deco" style="left:0;top:0;width:100%;height:58px" viewBox="0 0 600 62" preserveAspectRatio="none">
+      <rect width="600" height="34" fill="#ff9ec4"/>
+      <rect x="60" width="60" height="34" fill="#fff"/><rect x="180" width="60" height="34" fill="#fff"/>
+      <rect x="300" width="60" height="34" fill="#fff"/><rect x="420" width="60" height="34" fill="#fff"/>
+      <rect x="540" width="60" height="34" fill="#fff"/>
+      <circle cx="30" cy="34" r="30" fill="#ff9ec4"/><circle cx="90" cy="34" r="30" fill="#fff"/>
+      <circle cx="150" cy="34" r="30" fill="#ff9ec4"/><circle cx="210" cy="34" r="30" fill="#fff"/>
+      <circle cx="270" cy="34" r="30" fill="#ff9ec4"/><circle cx="330" cy="34" r="30" fill="#fff"/>
+      <circle cx="390" cy="34" r="30" fill="#ff9ec4"/><circle cx="450" cy="34" r="30" fill="#fff"/>
+      <circle cx="510" cy="34" r="30" fill="#ff9ec4"/><circle cx="570" cy="34" r="30" fill="#fff"/>
+    </svg>
+    <div class="shopname">✿ Бутик Лили ✿</div>
+    <svg class="deco" viewBox="0 0 300 120" style="left:4%;top:15%;width:46%;max-width:320px">
+      <rect x="4" y="10" width="292" height="9" rx="4.5" fill="#c9a7e8"/>
+      <rect x="10" y="19" width="9" height="98" rx="4.5" fill="#c9a7e8"/>
+      <rect x="281" y="19" width="9" height="98" rx="4.5" fill="#c9a7e8"/>
+    </svg>
+    <button class="obj" data-id="s-dress0" style="left:7%;top:17%;width:12%;max-width:84px">
+      <svg viewBox="0 0 80 104" width="100%"><path d="M40,2 q0,9 -8,11" stroke="#9c8aa8" stroke-width="4" fill="none"/>
+      <path d="M26,22 Q40,15 54,22 L66,92 Q40,102 14,92 Z" fill="#ff9ebb" stroke="#e5749b" stroke-width="4" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="obj" data-id="s-dress1" style="left:22%;top:17%;width:12%;max-width:84px">
+      <svg viewBox="0 0 80 104" width="100%"><path d="M40,2 q0,9 -8,11" stroke="#9c8aa8" stroke-width="4" fill="none"/>
+      <path d="M26,22 Q40,15 54,22 L64,84 Q58,98 48,88 Q40,100 32,88 Q22,98 16,84 Z" fill="#c8a2e8" stroke="#a678d0" stroke-width="4" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="obj" data-id="s-dress2" style="left:37%;top:17%;width:12%;max-width:84px">
+      <svg viewBox="0 0 80 104" width="100%"><path d="M40,2 q0,9 -8,11" stroke="#9c8aa8" stroke-width="4" fill="none"/>
+      <path d="M28,22 Q40,16 52,22 L54,54 L26,54 Z" fill="#fff" stroke="#dcd0e6" stroke-width="4"/>
+      <path d="M22,52 L58,52 L66,92 Q40,102 14,92 Z" fill="#9fe0c0" stroke="#6fbf98" stroke-width="4" stroke-linejoin="round"/></svg>
+    </button>
+    <svg class="deco" viewBox="0 0 160 140" style="left:54%;top:14%;width:20%;max-width:140px">
+      <rect x="6" y="28" width="148" height="10" rx="5" fill="#d894b4"/>
+      <rect x="6" y="74" width="148" height="10" rx="5" fill="#d894b4"/>
+      <rect x="16" y="84" width="9" height="52" rx="4.5" fill="#d894b4"/>
+      <rect x="135" y="84" width="9" height="52" rx="4.5" fill="#d894b4"/>
+      <text x="28" y="26" font-size="24">🌷</text><text x="66" y="26" font-size="24">🌹</text><text x="104" y="26" font-size="24">🌻</text>
+      <text x="28" y="72" font-size="24">🌼</text><text x="66" y="72" font-size="24">🌺</text><text x="104" y="72" font-size="24">💮</text>
+    </svg>
+    <button class="obj" data-id="s-flowers" style="left:59%;top:23.5%;font-size:34px">💐</button>
+    <button class="deco tappable obj" data-id="s-mirror" style="right:3%;top:13%;width:17%;max-width:120px">
+      <svg viewBox="0 0 100 170" width="100%">
+        <ellipse cx="50" cy="70" rx="40" ry="60" fill="#dff3ff" stroke="#e8b6cc" stroke-width="8"/>
+        <path d="M34,38 Q50,22 66,38" stroke="#fff" stroke-width="6" fill="none" opacity=".85"/>
+        <path d="M28,144 L50,120 L72,144" stroke="#d894b4" stroke-width="9" fill="none" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <svg class="deco" viewBox="0 0 200 60" style="left:5%;bottom:29%;width:38%;max-width:260px">
+      <rect x="0" y="8" width="200" height="16" rx="8" fill="#c9a7e8"/>
+      <path d="M34,24 L34,52 L62,24 Z" fill="#b28fd6"/>
+      <path d="M166,24 L166,52 L138,24 Z" fill="#b28fd6"/>
+    </svg>
+    <button class="obj" data-id="s-shoes0" style="left:7%;bottom:33%;width:10%;max-width:70px">
+      <svg viewBox="0 0 80 50" width="100%"><rect x="6" y="10" width="68" height="32" rx="15" fill="#fff" stroke="#dcd3e8" stroke-width="4"/>
+      <path d="M8,29 h64" stroke="#ff9ebb" stroke-width="7"/></svg>
+    </button>
+    <button class="obj" data-id="s-shoes1" style="left:19%;bottom:33%;width:10%;max-width:70px">
+      <svg viewBox="0 0 80 50" width="100%"><ellipse cx="40" cy="30" rx="31" ry="15" fill="#e5749b"/><circle cx="40" cy="19" r="5.5" fill="#fff"/></svg>
+    </button>
+    <button class="obj" data-id="s-shoes2" style="left:31%;bottom:32.5%;width:9%;max-width:64px">
+      <svg viewBox="0 0 80 62" width="100%"><rect x="22" y="4" width="36" height="54" rx="13" fill="#a9795f" stroke="#8d6047" stroke-width="4"/></svg>
+    </button>
+    <svg class="deco" viewBox="0 0 160 150" style="right:7%;bottom:26%;width:26%;max-width:170px">
+      <ellipse cx="80" cy="26" rx="74" ry="20" fill="#fff" stroke="#eec4da" stroke-width="5"/>
+      <rect x="74" y="40" width="12" height="84" fill="#e8a8c4"/>
+      <ellipse cx="80" cy="128" rx="34" ry="10" fill="#e8a8c4"/>
+    </svg>
+    <button class="obj" data-id="s-bow" style="right:24%;bottom:36%;font-size:30px">🎀</button>
+    <button class="obj" data-id="s-ears" style="right:15%;bottom:36%;width:9%;max-width:56px">
+      <svg viewBox="0 0 80 50" width="100%"><path d="M10,48 L23,6 L47,34 Z" fill="#7a5230" stroke="#5d3d20" stroke-width="3"/>
+      <path d="M70,48 L57,6 L33,34 Z" fill="#7a5230" stroke="#5d3d20" stroke-width="3"/></svg>
+    </button>
+    <button class="obj" data-id="s-glass" style="right:5%;bottom:36%;font-size:28px">👓</button>
+  </div>
+
+  <!-- ================= CINEMA ================= -->
+  <div class="scene" id="sc-cine" style="--sb:4%">
+    <div class="wall"></div>
+    <div class="floor"></div>
+    <button class="obj" id="screenBox" data-id="k-screen"><div id="film"></div></button>
+    <div style="position:absolute;left:50%;top:40.5%;transform:translateX(-50%);color:#ffd97a;font-weight:800;font-size:13px;letter-spacing:3px;z-index:4;white-space:nowrap">🎬 КИНОТЕАТР 🎬</div>
+    <svg class="seatrow" style="bottom:15%;height:9%;z-index:4;opacity:.8" viewBox="0 0 400 80" preserveAspectRatio="none">
+      <rect x="6" y="8" width="88" height="70" rx="14" fill="#8f3a66"/><rect x="104" y="8" width="88" height="70" rx="14" fill="#9c4270"/>
+      <rect x="202" y="8" width="88" height="70" rx="14" fill="#8f3a66"/><rect x="300" y="8" width="88" height="70" rx="14" fill="#9c4270"/>
+    </svg>
+    <svg class="deco" viewBox="0 0 160 124" style="left:3%;bottom:22%;width:29%;max-width:180px;z-index:5">
+      <rect x="8" y="26" width="144" height="92" rx="12" fill="#ff9ec4" stroke="#e5749b" stroke-width="4"/>
+      <rect x="8" y="26" width="144" height="18" fill="#fff" opacity=".85"/>
+      <rect x="8" y="58" width="144" height="14" fill="#fff" opacity=".55"/>
+      <text x="80" y="106" text-anchor="middle" font-size="17" fill="#fff" font-weight="800">СНЕКИ</text>
+    </svg>
+    <button class="obj" data-id="k-pop" style="left:7%;bottom:35%;font-size:38px;z-index:6">🍿</button>
+    <button class="obj" data-id="k-cola" style="left:20%;bottom:35%;font-size:34px;z-index:6">🥤</button>
+    <svg class="seatrow" style="bottom:-1%;height:13%;z-index:12" viewBox="0 0 400 80" preserveAspectRatio="none">
+      <rect x="6" y="6" width="88" height="74" rx="14" fill="#d9548c" stroke="#b8437a" stroke-width="4"/>
+      <rect x="104" y="6" width="88" height="74" rx="14" fill="#e05e95" stroke="#b8437a" stroke-width="4"/>
+      <rect x="202" y="6" width="88" height="74" rx="14" fill="#d9548c" stroke="#b8437a" stroke-width="4"/>
+      <rect x="300" y="6" width="88" height="74" rx="14" fill="#e05e95" stroke="#b8437a" stroke-width="4"/>
+    </svg>
   </div>
 
   <!-- ================= WARDROBE ================= -->
@@ -471,6 +640,8 @@ body{
   <button class="navb sel" data-scene="sc-home"><span class="nicon">🏠</span>Дом</button>
   <button class="navb" data-scene="sc-fit"><span class="nicon">👗</span>Наряды</button>
   <button class="navb" data-scene="sc-cafe"><span class="nicon">🧁</span>Кафе</button>
+  <button class="navb" data-scene="sc-shop"><span class="nicon">🛍️</span>Магазин</button>
+  <button class="navb" data-scene="sc-cine"><span class="nicon">🎬</span>Кино</button>
   <button class="navb" data-scene="sc-park"><span class="nicon">🌳</span>Парк</button>
 </div>
 
@@ -645,6 +816,8 @@ const S={
   night(){tone(500,.3,{f2:250,type:"sine",vol:.1});},
   melody(){[523,587,659,784,659,880,784].forEach((n,i)=>tone(n,.16,{delay:i*.17,type:"triangle",vol:.11}));},
   lullaby(){[659,587,523].forEach((n,i)=>tone(n,.5,{delay:i*.55,type:"triangle",vol:.09}));},
+  magic(){[784,988,1175,1568].forEach((n,i)=>tone(n,.22,{delay:i*.09,type:"triangle",vol:.12}));tone(500,.5,{f2:1100,delay:.42,vol:.06});},
+  pop3(){[420,610,820].forEach((n,i)=>tone(n+Math.random()*80,.07,{delay:i*.09,type:"square",vol:.05}));},
   fanfare(){[523,659,784,1047].forEach((n,i)=>tone(n,.25,{delay:i*.13,type:"triangle",vol:.14}));}
 };
 document.getElementById("sndbtn").addEventListener("click",e=>{
@@ -711,7 +884,8 @@ function giveStar(id,el){
   }));
   setTimeout(()=>{
     f.remove();
-    document.getElementById("starN").textContent=Math.min(stars.size,10);
+    const n=stars.size;
+    box.textContent="⭐ "+(n>=10?n:n+"/10");
     box.classList.add("bump");setTimeout(()=>box.classList.remove("bump"),220);
     S.star();
     if(stars.size>=10&&!st.crown){st.crown=true;unlockCrown();}
@@ -863,8 +1037,61 @@ const ACTIONS={
   "p-flower1":(el)=>{S.pop();burstAt(el,["🌸","✨","🌷"],6);},
   "p-flower2":(el)=>{S.pop();burstAt(el,["🌼","✨","🐝"],6);},
   "p-flower3":(el)=>{S.pop();burstAt(el,["🌸","💮","✨"],6);},
-  "p-ice":(el)=>flyToLily(el,"🍦","Мороженое! 🍦")
+  "p-ice":(el)=>flyToLily(el,"🍦","Мороженое! 🍦"),
+  "p-uni":(el)=>{S.magic();miniSay(el,"И-го-го! ✨");burstAt(el,["🌈","⭐","✨","💖"],10);},
+  "c-boba":(el)=>flyToLily(el,"🧋","Бабл-ти! Ура!"),
+  "c-shake":(el)=>flyToLily(el,"🥤","Молочный коктейль!"),
+  "c-tea":(el)=>flyToLily(el,"🍵","Тёплый чай!"),
+  "c-crois":(el)=>flyToLily(el,"🥐","Хрустик!"),
+  "c-berry":(el)=>flyToLily(el,"🍓","Клубничка!"),
+  "h-paint":(el)=>{
+    homeTheme=(homeTheme+1)%4;
+    const h=document.getElementById("sc-home");
+    h.classList.remove("t1","t2","t3");
+    if(homeTheme>0)h.classList.add("t"+homeTheme);
+    S.pop();burstAt(el,["🎨","✨"],6);say("Новые обои! 🎨");
+  },
+  "h-rug":(el)=>{
+    rugTheme=(rugTheme+1)%4;
+    el.classList.remove("r1","r2","r3");
+    if(rugTheme>0)el.classList.add("r"+rugTheme);
+    S.pop();burstAt(el,["✨"],4);
+  },
+  "h-toybox":(el)=>{
+    S.pop3();
+    const toys=["🦄","🧸","🐰","🚂","⚽","🪀","🎠"];
+    const t=document.createElement("span");
+    t.className="toy";
+    t.textContent=toys[Math.floor(Math.random()*toys.length)];
+    t.style.left=(8+Math.random()*68)+"%";
+    t.style.bottom=(3+Math.random()*15)+"%";
+    const box=document.getElementById("toys");
+    box.appendChild(t);
+    if(box.children.length>6)box.removeChild(box.firstChild);
+    burstAt(el,["✨","🎉"],5);
+  },
+  "s-dress0":(el)=>{st.dress=0;st.dressC=0;renderChar();S.pop();burstAt(el,["✨","💖"],5);say("Новое платье! 👗");},
+  "s-dress1":(el)=>{st.dress=1;st.dressC=1;renderChar();S.pop();burstAt(el,["✨","💜"],5);say("Платье с рюшами!");},
+  "s-dress2":(el)=>{st.dress=2;st.dressC=2;renderChar();S.pop();burstAt(el,["✨","💚"],5);say("Топ и юбочка!");},
+  "s-shoes0":(el)=>{st.shoes=0;renderChar();S.pop();burstAt(el,["✨"],4);say("Новые кеды!");},
+  "s-shoes1":(el)=>{st.shoes=1;renderChar();S.pop();burstAt(el,["✨"],4);say("Балетки!");},
+  "s-shoes2":(el)=>{st.shoes=2;renderChar();S.pop();burstAt(el,["✨"],4);say("Сапожки!");},
+  "s-bow":(el)=>{st.acc=1;renderChar();S.pop();burstAt(el,["🎀","✨"],4);say("Бантик!");},
+  "s-ears":(el)=>{st.acc=2;renderChar();S.pop();burstAt(el,["🐱","✨"],4);say("Ушки! Мяу!");},
+  "s-glass":(el)=>{st.acc=3;renderChar();S.pop();burstAt(el,["👓","✨"],4);say("Очки!");},
+  "s-flowers":(el)=>flyToLily(el,"💐","Какая красота!"),
+  "s-mirror":(el)=>{S.pop();burstAt(el,["✨","💖"],6);say("Красотка! 💖");},
+  "k-screen":(el)=>{filmI=(filmI+1)%FILMS.length;setFilm(filmI);S.melody();burstAt(el,["🎬","✨"],5);},
+  "k-pop":(el)=>flyToLily(el,"🍿","Хрум! Попкорн!"),
+  "k-cola":(el)=>flyToLily(el,"🥤","Буль-буль!")
 };
+/* кино */
+const FILMS=[{bg:"🌈",mv:"🦄"},{bg:"🏰",mv:"👸"},{bg:"🌊",mv:"🐬"},{bg:"⭐",mv:"🚀"}];
+let filmI=0,homeTheme=0,rugTheme=0;
+function setFilm(i){
+  const f=FILMS[i];
+  document.getElementById("film").innerHTML=`<span class="fbg">${f.bg}</span><span class="fmv">${f.mv}</span>`;
+}
 document.querySelectorAll(".obj[data-id]").forEach(el=>{
   el.addEventListener("click",e=>{
     e.stopPropagation();
@@ -968,6 +1195,7 @@ if(window.innerWidth>=640){
 }
 renderChar();
 buildFitBody();
+setFilm(0);
 window.addEventListener("resize",()=>{
   if(curScene&&curScene.id!=="sc-fit"){
     const w=curScene.clientWidth;
